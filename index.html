@@ -1,0 +1,1742 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vườn Hoa Hóa Trị</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+    <!-- Scripts & CDNs -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              'garden-pink': '#FDCEDF',
+              'garden-pink-light': '#FFF0F5',
+              'garden-lavender': '#E8A0BF',
+              'garden-purple': '#C9A7EB',
+              'garden-rose': '#FFB6B9',
+            },
+            fontFamily: {
+              sans: ['Inter', 'sans-serif'],
+              display: ['Space Grotesk', 'sans-serif'],
+              mono: ['JetBrains Mono', 'monospace'],
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      .soft-glow-pink { box-shadow: 0 0 15px rgba(253, 206, 223, 0.6); }
+      .soft-glow-mint { box-shadow: 0 0 15px rgba(129, 199, 132, 0.6); }
+      /* Card flips */
+      .card-perspective { perspective: 1000px; }
+      .card-inner {
+        transition: transform 0.5s;
+        transform-style: preserve-3d;
+      }
+      .card-flipped { transform: rotateY(180deg); }
+      .backface-hidden { backface-visibility: hidden; }
+      /* Floating notification styling */
+      @keyframes floatUp {
+        0% { opacity: 0; transform: translate(-50%, 20px) scale(0.9); }
+        15% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+        85% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+        100% { opacity: 0; transform: translate(-50%, -20px) scale(0.9); }
+      }
+      .animate-float-toast { animation: floatUp 4.5s forwards ease-in-out; }
+      @keyframes pointFloat {
+        0% { opacity: 0; transform: translateY(10px) scale(0.8); }
+        50% { opacity: 1; transform: translateY(-30px) scale(1.2); }
+        100% { opacity: 0; transform: translateY(-60px) scale(1.3); }
+      }
+      .animate-point { animation: pointFloat 1.2s forwards ease-out; }
+    </style>
+  </head>
+  <body class="min-h-screen bg-[#FCF8F4] text-neutral-800 flex flex-col font-sans transition-all relative pb-20 md:pb-6">
+    <!-- DECORATIVE BG -->
+    <div class="absolute top-0 left-0 w-full overflow-hidden h-[420px] pointer-events-none z-0">
+      <div class="absolute top-[-100px] left-[-50px] w-80 h-80 rounded-full bg-pink-100 opacity-60 blur-3xl"></div>
+      <div class="absolute top-20 right-[-100px] w-96 h-96 rounded-full bg-purple-100 opacity-50 blur-3xl"></div>
+    </div>
+
+    <!-- TOAST POPUP -->
+    <div id="toast-container" class="fixed bottom-24 md:bottom-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none hidden">
+      <div id="toast-msg" class="bg-gradient-to-r from-pink-400 via-rose-500 to-indigo-500 text-white text-xs font-bold py-3.5 px-6 rounded-2xl shadow-xl border border-white/20 text-center min-w-[280px]"></div>
+    </div>
+
+    <!-- HEADER NAVIGATION -->
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-40 border-b border-pink-100 flex items-center justify-between px-6 py-4 max-w-7xl mx-auto w-full rounded-b-3xl shadow-sm" id="app-header">
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="navigate('home')">
+        <div class="w-10 h-10 bg-gradient-to-tr from-pink-300 to-rose-400 rounded-2xl flex items-center justify-center text-white border border-rose-100/40 shadow-inner">
+          <span class="text-xl animate-spin" style="animation-duration: 8s;">🌸</span>
+        </div>
+        <div>
+          <h1 class="text-lg font-black font-display text-rose-950 tracking-tight leading-none">Vườn Hoa Hóa Trị</h1>
+          <span class="text-[10px] text-rose-500/80 uppercase font-black tracking-widest block mt-1">Chemistry Schoolyard</span>
+        </div>
+      </div>
+
+      <!-- DESKTOP NAV -->
+      <nav class="hidden md:flex bg-amber-50/50 p-1.5 rounded-full border border-pink-100 w-full max-w-lg items-center justify-around space-x-1 font-semibold text-xs text-rose-900/70" id="desktop-nav">
+        <button onclick="navigate('home')" id="btn-home" class="nav-active px-3.5 py-1.5 rounded-full font-bold transition-all flex items-center space-x-1">
+          <i data-lucide="home" class="w-3.5 h-3.5"></i> <span>Trang Chủ</span>
+        </button>
+        <button onclick="navigate('quiz')" id="btn-quiz" class="px-3.5 py-1.5 rounded-full font-bold transition-all">🌸 Đố Vui</button>
+        <button onclick="navigate('match')" id="btn-match" class="px-3.5 py-1.5 rounded-full font-bold transition-all">🔮 Kết Đôi</button>
+        <button onclick="navigate('sort')" id="btn-sort" class="px-3.5 py-1.5 rounded-full font-bold transition-all">🏺 Thả Lọ</button>
+        <button onclick="navigate('handbook')" id="btn-handbook" class="px-3.5 py-1.5 rounded-full font-bold transition-all flex items-center space-x-1">
+          <i data-lucide="book-open" class="w-3.5 h-3.5"></i> <span>Sổ Tay</span>
+        </button>
+        <button onclick="navigate('achievements')" id="btn-achievements" class="px-3.5 py-1.5 rounded-full font-bold transition-all flex items-center space-x-1">
+          <i data-lucide="award" class="w-3.5 h-3.5"></i> <span>Huy Chương</span>
+        </button>
+      </nav>
+
+      <!-- STATS RIGHT -->
+      <div class="flex items-center space-x-1 bg-rose-50 text-rose-700 px-3 py-1.5 rounded-full border border-rose-100 font-bold font-mono text-xs">
+        <span>✨</span>
+        <span id="header-points">0</span>
+        <span class="text-[9px] text-rose-400">pt</span>
+      </div>
+    </header>
+
+    <!-- MOBILE LOWER NAVIGATION (Floats on bottom) -->
+    <div class="md:hidden fixed bottom-4 left-4 right-4 z-50 bg-white/95 backdrop-blur-md p-2 rounded-2xl border border-pink-100 shadow-lg flex justify-around items-center text-[10px] text-stone-400" id="mobile-nav">
+      <button onclick="navigate('home')" id="m-btn-home" class="flex flex-col items-center p-1 cursor-pointer transition-all text-rose-600 scale-105 font-bold">
+        <i data-lucide="home" class="w-4 h-4 mb-0.5"></i> <span>Vườn</span>
+      </button>
+      <button onclick="navigate('quiz')" id="m-btn-quiz" class="flex flex-col items-center p-1 cursor-pointer transition-all">
+        <span class="text-sm leading-4 mb-0.5">🌸</span> <span>Đố Vui</span>
+      </button>
+      <button onclick="navigate('match')" id="m-btn-match" class="flex flex-col items-center p-1 cursor-pointer transition-all">
+        <span class="text-sm leading-4 mb-0.5">🔮</span> <span>Kết Đôi</span>
+      </button>
+      <button onclick="navigate('sort')" id="m-btn-sort" class="flex flex-col items-center p-1 cursor-pointer transition-all">
+        <span class="text-sm leading-4 mb-0.5">🏺</span> <span>Thả Lọ</span>
+      </button>
+      <button onclick="navigate('handbook')" id="m-btn-handbook" class="flex flex-col items-center p-1 cursor-pointer transition-all">
+        <i data-lucide="book-open" class="w-4 h-4 mb-0.5"></i> <span>Sổ Tay</span>
+      </button>
+      <button onclick="navigate('achievements')" id="m-btn-achievements" class="flex flex-col items-center p-1 cursor-pointer transition-all">
+        <i data-lucide="award" class="w-4 h-4 mb-0.5"></i> <span>Medal</span>
+      </button>
+    </div>
+
+    <!-- CORE CHASSIS MAIN VIEWS -->
+    <main class="flex-1 max-w-7xl mx-auto w-full px-4 sm:px-6 pt-6 z-10" id="main-viewport">
+      <!-- 1. HOME SCREEN -->
+      <section id="screen-home" class="screen-view space-y-6">
+        <!-- Hero section -->
+        <div class="bg-gradient-to-r from-rose-100 via-pink-50 to-amber-100 rounded-3xl p-6 md:p-8 border border-rose-200 shadow-sm relative overflow-hidden flex flex-col md:flex-row items-center justify-between gap-6">
+          <div class="space-y-3 flex-1 text-center md:text-left">
+            <span class="text-xs bg-white/70 text-rose-600 inline-block font-black px-3 py-1 rounded-full border border-rose-200">🌈 Chào mừng học sinh THPT</span>
+            <h2 class="text-xl md:text-2xl font-black font-display text-rose-950">Gieo Trồng Tri Thức, Gặt Hái Hóa Trị!</h2>
+            <p class="text-xs text-amber-900/70 max-w-xl">Học thuật thăng hoa cùng Vườn Hoa Hóa Trị. Ôn luyện cực thông minh, tự do mài giũa kiến thức nguyên tố, gốc muối đồng thời thu hoạch bảng vàng huy chương rực rỡ!</p>
+            <div id="home-quote" class="bg-white/60 text-[10px] py-1.5 px-3.5 rounded-2xl border border-rose-200/50 italic text-rose-900 inline-block max-w-md"></div>
+          </div>
+          <div class="bg-white/80 p-4 rounded-3xl border border-rose-100 shadow-sm flex flex-col items-center justify-center text-center w-36 h-36 shrink-0 select-none">
+            <span class="text-4xl animate-bounce">🌱</span>
+            <span class="text-[10px] text-stone-400 font-bold mt-2 uppercase tracking-wide">Điểm Trí Tuệ</span>
+            <span id="hero-points" class="text-lg font-black font-display text-rose-600 mt-0.5">0 pt</span>
+          </div>
+        </div>
+
+        <!-- 3 Launcher Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <!-- Quiz card -->
+          <div class="bg-white rounded-3xl border border-rose-150 p-6 shadow-sm flex flex-col justify-between min-h-[200px]">
+            <div class="space-y-2">
+              <div class="w-10 h-10 bg-rose-50 rounded-2xl flex items-center justify-center text-xl border border-rose-100 shadow-inner">🌸</div>
+              <h3 class="text-sm font-bold text-rose-950 font-display">Mảnh Vườn Đố Vui Hóa Trị</h3>
+              <p class="text-[11px] text-amber-900/60 leading-relaxed">Trắc nghiệm nhanh 10 câu hỏi có đếm ngược thời gian. Hỗ trợ hệ thống Hồi Sinh bằng câu đố và bộ mẹo ca học nhớ lâu!</p>
+            </div>
+            <div class="pt-4 flex justify-between items-center border-t border-rose-50 mt-4 text-[10px]">
+              <span id="record-quiz" class="text-rose-500 font-mono font-semibold">Kỷ lục: 0 pt</span>
+              <button onclick="navigate('quiz')" class="bg-rose-100 text-rose-700 hover:bg-rose-200 px-3.5 py-1.5 rounded-full font-bold flex items-center space-x-1 cursor-pointer">
+                <span>Chăm Hoa</span> <i data-lucide="arrow-right" class="w-3 h-3"></i>
+              </button>
+            </div>
+          </div>
+          <!-- Match Card -->
+          <div class="bg-white rounded-3xl border border-rose-150 p-6 shadow-sm flex flex-col justify-between min-h-[200px]">
+            <div class="space-y-2">
+              <div class="w-10 h-10 bg-indigo-50 rounded-2xl flex items-center justify-center text-xl border border-indigo-100 shadow-inner">🔮</div>
+              <h3 class="text-sm font-bold text-rose-950 font-display">Thẻ Bài Kết Đôi Ma Thuật</h3>
+              <p class="text-[11px] text-amber-900/60 leading-relaxed">Trò chơi lật ảnh rèn luyện ghi nhớ vượt trội. Kết hợp nguyên tố/gốc muối với chữ số La Mã để phá kỷ lục lật nhanh!</p>
+            </div>
+            <div class="pt-4 flex justify-between items-center border-t border-rose-50 mt-4 text-[10px]">
+              <span id="record-match" class="text-indigo-500 font-mono font-semibold">Kỷ lục: 0 pt</span>
+              <button onclick="navigate('match')" class="bg-indigo-100 text-indigo-700 hover:bg-indigo-200 px-3.5 py-1.5 rounded-full font-bold flex items-center space-x-1 cursor-pointer">
+                <span>Khai Bài</span> <i data-lucide="arrow-right" class="w-3 h-3"></i>
+              </button>
+            </div>
+          </div>
+          <!-- Sort card -->
+          <div class="bg-white rounded-3xl border border-rose-150 p-6 shadow-sm flex flex-col justify-between min-h-[200px]">
+            <div class="space-y-2">
+              <div class="w-10 h-10 bg-teal-50 rounded-2xl flex items-center justify-center text-xl border border-teal-100 shadow-inner">🏺</div>
+              <h3 class="text-sm font-bold text-rose-950 font-display">Lọ Phép Phân Loại Hóa Trị</h3>
+              <p class="text-[11px] text-amber-900/60 leading-relaxed font-normal">Ném bóng phân tách siêu tốc. Phân biệt kim loại, phi kim và hũ hóa trị I, II hay III trong 45s dồn dập đầy phấn khích!</p>
+            </div>
+            <div class="pt-4 flex justify-between items-center border-t border-rose-50 mt-4 text-[10px]">
+              <span id="record-sort" class="text-teal-500 font-mono font-semibold">Kỷ lục: 0 pt</span>
+              <button onclick="navigate('sort')" class="bg-teal-100 text-teal-700 hover:bg-teal-200 px-3.5 py-1.5 rounded-full font-bold flex items-center space-x-1 cursor-pointer">
+                <span>Thả Lọ</span> <i data-lucide="arrow-right" class="w-3 h-3"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- History & Advice Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+          <div class="lg:col-span-4 bg-white p-6 rounded-3xl border border-rose-100 shadow-sm space-y-4">
+            <h4 class="text-sm font-bold font-display text-rose-950 flex items-center space-x-2">
+              <i data-lucide="activity" class="w-4 h-4 text-rose-500"></i>
+              <span>Nhật Ký Học Tập</span>
+            </h4>
+            <div id="history-list" class="space-y-2 text-xs max-h-[160px] overflow-y-auto">
+              <div class="text-stone-400 italic text-center py-6 text-[11px]">Chưa lưu ván chơi nào hôm nay hết. Nhấn chọn game chơi đi nha cậu! 🌸</div>
+            </div>
+          </div>
+          <!-- Academic tips right -->
+          <div class="lg:col-span-8 bg-white p-6 rounded-3xl border border-rose-100 shadow-sm space-y-4">
+            <h4 class="text-sm font-bold text-rose-950 font-display">💡 Bí quyết sút bay nỗi sợ hóa chất THPT</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
+              <div class="p-3.5 rounded-2xl bg-rose-50/50 border border-rose-100 flex items-start gap-3">
+                <span class="text-lg">🍇</span>
+                <div>
+                  <p class="font-bold text-rose-900 mb-0.5">Quy tắc hiđrô axit</p>
+                  <p class="text-[11px] text-amber-900/60 leading-normal">Mỗi nguyên tử hiđrô bị mất đi từ sườn axit gốc tự động bằng hóa trị gốc axit đấy! Ví dụ H₂SO₄ bớt 2 H sẽ ra gốc SO₄ hóa trị II.</p>
+                </div>
+              </div>
+              <div class="p-3.5 rounded-2xl bg-rose-50/50 border border-rose-100 flex items-start gap-3">
+                <span class="text-lg">🍓</span>
+                <div>
+                  <p class="font-bold text-rose-900 mb-0.5">Nhóm nguyên tố</p>
+                  <p class="text-[11px] text-amber-900/60 leading-normal">Kim loại kiềm tinh nghịch (IA: Na, K, Li) luôn hóa trị I. Kim loại kiềm thổ vững vàng (IIA: Ca, Mg, Ba, Zn) luôn hóa trị II.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. QUIZ SCREEN -->
+      <section id="screen-quiz" class="screen-view hidden space-y-6">
+        <!-- Quiz intro -->
+        <div id="quiz-intro" class="bg-white p-8 rounded-3xl border border-rose-100 shadow-sm text-center max-w-xl mx-auto space-y-5">
+          <div class="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center mx-auto text-3xl border border-rose-100">🌸</div>
+          <div class="space-y-1.5">
+            <h3 class="text-xl font-bold font-display text-rose-950">Mảnh Vườn Đố Vui Hóa Trị</h3>
+            <p class="text-xs text-amber-900/70">Khai thông năng lực bằng cách chăm bón đoá hoa hóa học kỳ bí lớn khôn qua 10 câu trắc nghiệm hóa trị.</p>
+          </div>
+          <div class="bg-rose-50/50 p-4 rounded-xl text-left border border-pink-100 text-[11px] space-y-1.5 text-amber-900/80 leading-normal">
+            <p class="font-bold text-rose-800">🌸 Thể lệ mảnh vườn:</p>
+            <p>• Trải qua 10 câu trừng phạt có giới hạn <strong>30 giây</strong> đếm lùi.</p>
+            <p>• Bắt đầu với <strong>3 trái tim</strong> 💖. Chọn sai mất 1 tim và hiển thị giải thích ca vè cực ngọt.</p>
+            <p>• Gặp nguy mất sạch tim? Đừng lo, bạn có <strong>1 cơ hội giải đố Đúng/Sai</strong> để hồi sinh ngay lập tức!</p>
+          </div>
+          <button onclick="startQuiz()" class="w-full bg-gradient-to-r from-rose-400 to-pink-500 hover:scale-102 active:scale-98 text-white text-xs font-bold py-3 px-6 rounded-2xl shadow-md transition-all cursor-pointer">
+            Gieo Hạt Trồng Hoa 🌿
+          </button>
+        </div>
+
+        <!-- Quiz Gameplay wrapper -->
+        <div id="quiz-arena" class="hidden grid grid-cols-1 md:grid-cols-12 gap-6 items-stretch">
+          <!-- Left flower -->
+          <div class="md:col-span-4 bg-white p-6 rounded-3xl border border-rose-150 shadow-sm flex flex-col justify-between items-center text-center relative overflow-hidden">
+            <div>
+              <span class="text-[10px] font-black text-rose-400 uppercase tracking-widest block">Giai đoạn hoa lớn</span>
+              <h4 id="flower-stage-text" class="text-xs font-bold text-amber-950 mt-0.5">Hạt mầm bé bỏng</h4>
+            </div>
+            <!-- Pot visualizer -->
+            <div class="w-40 h-40 my-4 relative">
+              <svg id="quiz-flower-svg" viewBox="0 0 100 100" class="w-full h-full"></svg>
+            </div>
+            <div class="bg-rose-50/70 p-2.5 rounded-xl border border-rose-100 w-full text-[10px] text-rose-900/80" id="flower-stage-desc"></div>
+          </div>
+          <!-- Right playing pane -->
+          <div class="md:col-span-8 flex flex-col justify-between space-y-4">
+            <!-- Stats bar -->
+            <div class="bg-white p-4 rounded-3xl border border-rose-150 shadow-sm flex items-center justify-between text-xs font-bold">
+              <div class="flex items-center space-x-1" id="hearts-box"></div>
+              <div class="flex items-center space-x-1 bg-rose-50 text-rose-700 px-3 py-1 rounded-full border border-rose-100 font-mono">
+                <i data-lucide="timer" class="w-3.5 h-3.5 text-rose-600"></i>
+                <span id="quiz-timer">30</span>s
+              </div>
+              <div class="flex items-center space-x-2">
+                <span id="streak-badge" class="hidden bg-orange-100 text-orange-600 px-2 py-0.5 rounded-full text-[10px] font-bold animate-bounce">🔥</span>
+                <span class="text-stone-400 font-semibold font-mono">Đạt: <span id="quiz-active-points" class="text-rose-600">0</span>đ</span>
+              </div>
+            </div>
+            <!-- Question card -->
+            <div id="quiz-card" class="bg-white p-6 rounded-3xl border border-rose-150 shadow-sm space-y-4 flex-1 flex flex-col justify-between">
+              <div>
+                <div class="flex justify-between items-center text-[10px] text-stone-400 font-semibold mb-1">
+                  <span id="quiz-progress-text">Câu hỏi 1/10</span>
+                  <span id="quiz-category-badge" class="bg-rose-50 text-rose-700 px-2 py-0.5 rounded-full">Nguyên Tố</span>
+                </div>
+                <h3 id="quiz-question-text" class="text-sm font-bold text-neutral-900"></h3>
+              </div>
+
+              <!-- Main Card Preview -->
+              <div class="bg-gradient-to-r from-rose-50/50 to-pink-50/50 rounded-2xl p-4 border border-rose-100/30 flex items-center justify-center space-x-4">
+                <span id="quiz-big-symbol" class="text-3xl font-black font-display text-rose-950 bg-white/95 px-4 py-1.5 rounded-xl border border-rose-200"></span>
+                <div class="text-left font-sans">
+                  <span class="text-[9px] text-stone-400 uppercase font-semibold block leading-none mb-1">Hóa Chất</span>
+                  <span id="quiz-item-name" class="text-xs font-extrabold text-neutral-800"></span>
+                </div>
+              </div>
+
+              <!-- Option buttons grid -->
+              <div id="quiz-options-grid" class="grid grid-cols-2 gap-3"></div>
+            </div>
+
+            <!-- Feedback section -->
+            <div id="quiz-feedback-banner" class="hidden p-4 rounded-3xl border shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div class="flex items-start space-x-2 text-xs">
+                <span id="feedback-smiley" class="text-2xl shrink-0 leading-none"></span>
+                <div>
+                  <p id="feedback-headline" class="font-bold leading-normal"></p>
+                  <p id="feedback-explanation" class="text-[11px] text-stone-500 italic mt-0.5 leading-normal"></p>
+                </div>
+              </div>
+              <button onclick="nextQuizQuestion()" class="bg-gradient-to-r from-rose-400 to-pink-500 text-white text-[11px] font-bold py-2.5 px-4 rounded-full flex items-center space-x-1 self-end md:self-center shadow-sm cursor-pointer whitespace-nowrap">
+                <span id="quiz-next-btn-text">Tiếp Theo</span> <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Revive area -->
+        <div id="quiz-revive" class="hidden bg-white p-8 rounded-3xl border border-emerald-100 shadow-sm text-center max-w-xl mx-auto space-y-5">
+          <div class="w-16 h-16 bg-emerald-50 rounded-full flex items-center justify-center mx-auto text-3xl border border-emerald-100">💖</div>
+          <div class="space-y-1">
+            <h3 class="text-lg font-bold font-display text-emerald-950">Giải Pháp Hồi Sinh Kính Quý</h3>
+            <p class="text-xs text-stone-500 leading-relaxed">Khu vườn đang héo úa đi nhiều! Hãy vượt qua thử thách Đúng hay Sai để phục hồi ngay lại <strong>2 trái tim 💖</strong> bối cảnh!</p>
+          </div>
+          <div class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-250 leading-relaxed font-sans text-xs font-semibold">
+            <span id="revive-symbol" class="text-2xl font-black font-display text-emerald-800 block mb-2"></span>
+            <span id="revive-question-text"></span>
+          </div>
+          <div class="flex gap-4">
+            <button onclick="answerRevive(true)" class="flex-1 bg-emerald-100 hover:bg-emerald-200 text-emerald-950 border border-emerald-300 font-bold py-2.5 px-4 rounded-xl text-xs cursor-pointer">Chính Xác (True)</button>
+            <button onclick="answerRevive(false)" class="flex-1 bg-stone-100 hover:bg-stone-200 text-stone-800 border border-stone-200 font-bold py-2.5 px-4 rounded-xl text-xs cursor-pointer">Sai Rồi (False)</button>
+          </div>
+          <button onclick="endQuiz()" class="text-[10px] text-stone-400 underline block mx-auto cursor-pointer">Nhận điểm hiện tại, kết thúc ván</button>
+        </div>
+
+        <!-- Summary card -->
+        <div id="quiz-summary" class="hidden bg-gradient-to-br from-rose-50 via-white to-pink-50 p-8 rounded-3xl border border-rose-200 shadow-sm text-center max-w-lg mx-auto space-y-6">
+          <div id="summary-emoji" class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto text-5xl">🌸</div>
+          <div class="space-y-1">
+            <h3 id="summary-headline" class="text-xl font-bold font-display text-rose-950"></h3>
+            <p class="text-xs text-amber-900/60 leading-relaxed">Bộ não rạng rỡ vừa ươm trồng đoá hoa hóa chất rạng ngời! Chi tiết ván chơi:</p>
+          </div>
+          <div class="grid grid-cols-2 gap-4 bg-white p-4 rounded-2xl border border-rose-100">
+            <div class="text-center border-r border-rose-50">
+              <span class="text-[9px] text-stone-400 font-bold uppercase block tracking-wider">Tổng Điểm Đạt</span>
+              <span id="summary-quiz-score" class="text-xl font-black font-mono text-rose-600">0</span>
+            </div>
+            <div class="text-center">
+              <span class="text-[9px] text-stone-400 font-bold uppercase block tracking-wider">Chuỗi Cao Nhất</span>
+              <span id="summary-quiz-streak" class="text-xl font-black font-mono text-orange-500">0🔥</span>
+            </div>
+          </div>
+          <div class="bg-rose-50/50 p-4 rounded-xl text-left border border-rose-100/50 text-xs text-amber-900 leading-relaxed font-sans" id="summary-quiz-advice"></div>
+          <div class="flex gap-3">
+            <button onclick="startQuiz()" class="flex-1 bg-gradient-to-r from-rose-400 to-pink-500 text-white font-bold py-3 px-4 rounded-xl text-xs hover:scale-102 transition-all cursor-pointer">Chăm Bón Lại</button>
+            <button onclick="navigate('home')" class="flex-1 bg-white hover:bg-stone-50 text-stone-700 border border-stone-200 font-bold py-3 px-4 rounded-xl text-xs cursor-pointer">Trang Chủ</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 3. MATCH SCREEN -->
+      <section id="screen-match" class="screen-view hidden space-y-6">
+        <!-- Match Intro -->
+        <div id="match-intro" class="bg-white p-8 rounded-3xl border border-rose-100 shadow-sm text-center max-w-xl mx-auto space-y-5">
+          <div class="w-16 h-16 bg-indigo-50 rounded-full flex items-center justify-center mx-auto text-3xl border border-indigo-100">🔮</div>
+          <div class="space-y-1.5">
+            <h3 class="text-xl font-bold font-display text-rose-950">Thẻ Bài Kết Đôi Ma Thuật</h3>
+            <p class="text-xs text-amber-900/70">Xếp bài tương thích kích động ghi nhớ sâu sắc dẻo dai giữa ký hiệu nguyên tố hoặc gốc muối với các thẻ số hóa trị thích ứng.</p>
+          </div>
+          <div class="bg-indigo-50/30 p-4 rounded-xl text-left border border-indigo-100 text-[11px] space-y-1.5 text-amber-900/80 leading-normal">
+            <p class="font-bold text-indigo-800">🔮 Hướng dẫn lật bài:</p>
+            <p>• Hệ thống chia ngẫu nhiên <strong>12 thẻ bài</strong> (6 chất & 6 con số hóa trị tương ứng).</p>
+            <p>• Lật mở lần lượt 2 lá bài. Nếu trùng hợp, lá bài biến thành hoa bay tuyệt diệu.</p>
+            <p>• Lật sai lá bài sẽ tự động lật úp lại để bạn <strong>tự do sai mà không mất mạng</strong>.</p>
+            <p>• Phá giải toàn bộ hũ thẻ bài dưới <strong>45 giây</strong> để mở khóa danh hiệu Điện Quang!</p>
+          </div>
+          <button onclick="startMatch()" class="w-full bg-gradient-to-r from-rose-400 to-pink-500 hover:scale-102 text-white text-xs font-bold py-3 px-6 rounded-2xl shadow-md transition-all cursor-pointer">
+            Mở Khóa Tập Bài Ma Thuật ✨
+          </button>
+        </div>
+
+        <!-- Match Arena layout -->
+        <div id="match-arena" class="hidden space-y-5">
+          <!-- Stats header row -->
+          <div class="bg-white p-4 rounded-3xl border border-rose-150 shadow-sm flex items-center justify-between text-xs font-bold">
+            <div class="flex items-center space-x-1 bg-rose-50 text-rose-700 px-3 py-1 rounded-full border border-rose-100 font-mono">
+              <i data-lucide="timer" class="w-3.5 h-3.5 text-rose-600"></i>
+              <span id="match-timer">00:00</span>
+            </div>
+            <div class="text-center font-sans text-amber-950">
+              <span class="text-[9px] text-stone-400 block font-normal uppercase">Lượt ghép</span>
+              <span id="match-moves">0 lượt</span>
+            </div>
+            <div class="text-center font-sans text-rose-600">
+              <span class="text-[9px] text-stone-400 block font-normal uppercase">Tiến trình</span>
+              <span id="match-progress">0 / 6 cặp</span>
+            </div>
+          </div>
+
+          <!-- Cards grid container -->
+          <div id="match-board" class="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-3 md:gap-4 select-none"></div>
+        </div>
+
+        <!-- Match Summary -->
+        <div id="match-summary" class="hidden bg-gradient-to-br from-violet-50 via-white to-pink-50 p-8 rounded-3xl border border-rose-200 shadow-sm text-center max-w-lg mx-auto space-y-6">
+          <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto text-6xl shadow-sm border border-purple-100">🔮✨</div>
+          <div class="space-y-1">
+            <h3 id="match-summary-title" class="text-lg font-bold font-display text-indigo-950">Kết Đôi Hoàn Thành!</h3>
+            <p class="text-xs text-stone-500">Mối liên quan ma thuật hóa học đã được lập chỉnh an cư lấp lánh cỏ thơm.</p>
+          </div>
+          <div class="grid grid-cols-3 gap-3 bg-white p-4 rounded-2xl border border-indigo-150 text-xs">
+            <div class="text-center border-r border-indigo-50">
+              <span class="text-[9px] text-stone-400 block">Thời gian</span>
+              <span id="match-summary-time" class="text-base font-black font-mono text-indigo-600">00:00</span>
+            </div>
+            <div class="text-center border-r border-indigo-50">
+              <span class="text-[9px] text-stone-400 block">Lượt Ghép</span>
+              <span id="match-summary-moves" class="text-base font-black font-mono text-purple-600">0 lượt</span>
+            </div>
+            <div class="text-center">
+              <span class="text-[9px] text-stone-400 block">Độ chuẩn xác</span>
+              <span id="match-summary-accuracy" class="text-base font-black font-mono text-emerald-600">100%</span>
+            </div>
+          </div>
+          <div class="flex gap-3">
+            <button onclick="startMatch()" class="flex-1 bg-gradient-to-r from-purple-500 to-pink-500 text-white font-bold py-3 px-4 rounded-xl text-xs cursor-pointer shadow-sm">Thử Sức Lại</button>
+            <button onclick="navigate('home')" class="flex-1 bg-white border border-stone-200 font-bold py-3 px-4 rounded-xl text-xs cursor-pointer">Sân Vườn</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 4. SORT SCREEN -->
+      <section id="screen-sort" class="screen-view hidden space-y-6">
+        <!-- Sort Intro -->
+        <div id="sort-intro" class="bg-white p-8 rounded-3xl border border-rose-100 shadow-sm text-center max-w-xl mx-auto space-y-5">
+          <div class="w-16 h-16 bg-teal-50 rounded-full flex items-center justify-center mx-auto text-3xl border border-teal-100">🏺</div>
+          <div class="space-y-1.5">
+            <h3 class="text-xl font-bold font-display text-rose-950">Lọ Phép Phân Loại Hóa Trị</h3>
+            <p class="text-xs text-amber-900/70">Rèn luyện phản xạ điện quang dứt khoát! Ném nhanh các tấm thẻ nguyên tố vào các hũ kẹo hóa trị tương ứng.</p>
+          </div>
+          <div class="bg-teal-50/40 p-4 rounded-xl text-left border border-teal-100 text-[11px] space-y-1.5 text-amber-900/80 leading-normal">
+            <p class="font-bold text-teal-800">🏺 Điều hành hũ phép:</p>
+            <p>• Trận đánh phản xạ dồn dập diễn ra trong vòng <strong>45 giây</strong>.</p>
+            <p>• Một tấm thẻ chất ngẫu nhiên xuất hiện giữa trang.</p>
+            <p>• Nhấn chọn hũ kẹo đúng: <strong>Hóa Hộp I</strong>, <strong>Hóa Hộp II</strong> hoặc <strong>Hũ III/Khác</strong>.</p>
+            <p>• Mỗi lượt thả chuẩn sủi bọt <strong>+15 điểm</strong>. Sai bị phạt <strong>-5 điểm và bớt đi 3 giây dồn dập</strong>!</p>
+            <p>• Chuỗi 10 lượt liên tục thành công gặt hái ngay Huy chương đỉnh cao!</p>
+          </div>
+          <button onclick="startSort()" class="w-full bg-gradient-to-r from-rose-400 to-pink-500 hover:scale-102 text-white text-xs font-bold py-3 px-6 rounded-2xl shadow-md transition-all cursor-pointer">
+            Bắt Đầu Phân Loại Hóa Phép 🏺
+          </button>
+        </div>
+
+        <!-- Sort Board -->
+        <div id="sort-arena" class="hidden space-y-6 relative">
+          <!-- Stats header rows -->
+          <div class="bg-white p-4 rounded-3xl border border-rose-150 shadow-sm flex items-center justify-between text-xs font-bold">
+            <div id="sort-timer-box" class="flex items-center space-x-1 bg-rose-50 text-rose-700 px-3 py-1 rounded-full border border-rose-100 font-mono">
+              <i data-lucide="timer" class="w-3.5 h-3.5 text-rose-600"></i>
+              <span id="sort-timer">45</span>s
+            </div>
+            <div class="bg-yellow-50 text-yellow-850 px-3 py-1 rounded-full border border-yellow-150 flex items-center space-x-1 font-mono">
+              <span>🌟 Chuỗi:</span> <span id="sort-streak">0 ván</span>
+            </div>
+            <div class="font-mono text-rose-950 text-sm font-black">
+              <span>Điểm: </span><span id="sort-active-score">0</span>
+            </div>
+          </div>
+
+          <!-- Active card view -->
+          <div class="relative py-6 bg-white rounded-3xl border border-rose-150 shadow-sm flex flex-col items-center justify-center text-center overflow-hidden min-h-[160px]">
+            <!-- Floating popup content -->
+            <div id="sort-float-val" class="absolute font-black text-xs px-3 py-1 rounded-full shadow-md z-20 pointer-events-none opacity-0"></div>
+            <div class="absolute w-36 h-36 rounded-full bg-pink-100/20 blur-2xl pointer-events-none"></div>
+
+            <div class="space-y-1 z-10 font-sans">
+              <span id="sort-cat-badge" class="text-[9px] font-bold px-2.5 py-0.5 rounded-full bg-teal-100 text-teal-800"></span>
+              <h4 id="sort-big-symbol" class="text-4xl font-black font-display text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-pink-500"></h4>
+              <p id="sort-item-name" class="text-xs font-bold text-neutral-800"></p>
+              <p class="text-[10px] text-stone-400 italic">Thả chất này vào lọ kẹo đúng nhanh đi nha!</p>
+            </div>
+          </div>
+
+          <!-- Live feedback text -->
+          <div class="min-h-[22px] text-center">
+            <span id="sort-feedback-text" class="text-[11px] font-medium leading-none py-1.5 px-3 rounded-full hidden"></span>
+          </div>
+
+          <!-- Jars containers columns -->
+          <div class="grid grid-cols-3 gap-4">
+            <!-- Jar I -->
+            <div onclick="submitSort('I')" id="jar-i" class="bg-white rounded-2xl border border-rose-200 p-4 cursor-pointer text-center space-y-2 group hover:bg-rose-50/30 transition-transform active:scale-95 shadow-sm">
+              <div class="w-10 h-10 bg-gradient-to-tr from-pink-300 to-pink-400 text-white rounded-xl flex items-center justify-center mx-auto text-base font-black font-display font-mono group-hover:scale-105 transition-all">I</div>
+              <h5 class="text-[11px] font-bold text-rose-950 font-display">Hũ Hóa Trị I</h5>
+              <p class="text-[9px] text-stone-400 leading-none">H, Na, K, Ag, OH...</p>
+            </div>
+            <!-- Jar II -->
+            <div onclick="submitSort('II')" id="jar-ii" class="bg-white rounded-2xl border border-rose-200 p-4 cursor-pointer text-center space-y-2 group hover:bg-rose-50/30 transition-transform active:scale-95 shadow-sm">
+              <div class="w-10 h-10 bg-gradient-to-tr from-teal-300 to-teal-400 text-white rounded-xl flex items-center justify-center mx-auto text-base font-black font-display font-mono group-hover:scale-105 transition-all">II</div>
+              <h5 class="text-[11px] font-bold text-teal-950 font-display">Hũ Hóa Trị II</h5>
+              <p class="text-[9px] text-stone-400 leading-none">Mg, Ca, Ba, Zn, SO₄...</p>
+            </div>
+            <!-- Jar III / Alt -->
+            <div onclick="submitSort('III_other')" id="jar-other" class="bg-white rounded-2xl border border-rose-200 p-4 cursor-pointer text-center space-y-2 group hover:bg-rose-50/30 transition-transform active:scale-95 shadow-sm">
+              <div class="w-10 h-10 bg-gradient-to-tr from-purple-300 to-purple-400 text-white rounded-xl flex items-center justify-center mx-auto text-xs font-black font-display group-hover:scale-105 transition-all leading-snug">III / Khác</div>
+              <h5 class="text-[11px] font-bold text-purple-950 font-display">Hũ Khác (III+)</h5>
+              <p class="text-[9px] text-stone-400 leading-none">Al, PO₄, S, Fe, P...</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sort Summary -->
+        <div id="sort-summary" class="hidden bg-gradient-to-br from-amber-50 via-white to-rose-50 p-8 rounded-3xl border border-rose-200 shadow-sm text-center max-w-lg mx-auto space-y-6">
+          <div class="w-20 h-20 bg-white rounded-full flex items-center justify-center mx-auto text-5xl shadow-sm">🏆🍯</div>
+          <div class="space-y-1">
+            <h3 class="text-xl font-bold font-display text-amber-950">Chiến Tích Hũ Phép Thuật!</h3>
+            <p class="text-xs text-amber-900/60 leading-relaxed">Hũ kẹo phép đã gom sương lấp lánh sổi hương. Thao tác phản xạ của ván vừa rồi:</p>
+          </div>
+          <div class="grid grid-cols-2 gap-4 bg-white p-4 rounded-2xl border border-rose-100">
+            <div class="text-center border-r border-rose-50">
+              <span class="text-[9px] text-stone-400 block tracking-widest font-black">ĐIỂM THẢ</span>
+              <span id="sort-summary-score" class="text-xl font-black font-mono text-rose-600">0</span>
+            </div>
+            <div class="text-center">
+              <span class="text-[9px] text-stone-400 block tracking-widest font-black">CHUỖI LỚN NHẤT</span>
+              <span id="sort-summary-streak" class="text-xl font-black font-mono text-yellow-500">0 ván</span>
+            </div>
+          </div>
+          <div class="bg-amber-100/30 p-4 rounded-xl text-left border border-amber-200/50 text-xs text-amber-950 leading-relaxed font-sans">
+            🌈 <strong>Đánh giá thực hành:</strong> Game phân hóa nhanh kích thích tầm ngắm phản diện trực quan cực có lợi lúc viết phản ứng lập công thức tỉ lệ mol. Cậu mài giũa tiến bộ rất xuất thần rồi đó!
+          </div>
+          <div class="flex gap-3 font-semibold">
+            <button onclick="startSort()" class="flex-1 bg-gradient-to-r from-rose-450 to-pink-500 text-white font-bold py-3 px-4 rounded-xl text-xs hover:scale-102 transition-all cursor-pointer shadow-sm">Thả Lọ Tiếp</button>
+            <button onclick="navigate('home')" class="flex-1 bg-white border border-stone-200 text-stone-700 py-3 px-4 rounded-xl text-xs cursor-pointer">Sân Vườn</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 5. HANDBOOK SCREEN -->
+      <section id="screen-handbook" class="screen-view hidden grid grid-cols-1 lg:grid-cols-12 gap-6 pb-6">
+        <!-- Search & Grid left -->
+        <div class="lg:col-span-7 flex flex-col space-y-4">
+          <div class="bg-white p-5 rounded-3xl border border-rose-150 shadow-sm space-y-3.5">
+            <div class="flex items-center space-x-2 text-rose-600">
+              <i data-lucide="book-open" class="w-5 h-5"></i>
+              <h2 class="text-lg font-bold font-display">Thư Viện Vườn Hoa Hóa Trị</h2>
+            </div>
+            <p class="text-xs text-amber-900/70">Tra cứu tức thì các nguyên tố cốt lõi THPT & cụm gốc muối kèm thơ nhớ, bài ca mẹo học chất chiu.</p>
+            <!-- Input search -->
+            <div class="relative">
+              <input oninput="searchHandbook(this.value)" type="text" placeholder="Tìm tên nguyên tố, ký hiệu (H, Na, SO4) hoặc hóa trị (I, II)..." class="pl-4 pr-10 py-2.5 text-xs w-full bg-orange-50/50 rounded-2xl border border-rose-200 focus:outline-none focus:ring-2 focus:ring-rose-200 transition-all font-sans text-amber-950">
+            </div>
+            <!-- Filters buttons -->
+            <div class="flex gap-2 text-[10px] select-none flex-wrap">
+              <button onclick="filterHandbook('all')" id="filter-all" class="px-3.5 py-1.5 rounded-full font-bold bg-gradient-to-r from-rose-400 to-pink-500 text-white cursor-pointer select-none">Tất Cả (<span id="count-all">0</span>)</button>
+              <button onclick="filterHandbook('element')" id="filter-element" class="px-3.5 py-1.5 rounded-full font-bold bg-teal-50 border border-teal-100 text-teal-800 hover:border-teal-300 cursor-pointer select-none">Nguyên Tố (<span id="count-elements">0</span>)</button>
+              <button onclick="filterHandbook('radical')" id="filter-radical" class="px-3.5 py-1.5 rounded-full font-bold bg-indigo-50 border border-indigo-100 text-indigo-800 hover:border-indigo-300 cursor-pointer select-none">Gốc Muối (<span id="count-radicals">0</span>)</button>
+            </div>
+          </div>
+
+          <!-- Cards library list container -->
+          <div class="bg-white p-5 rounded-3xl border border-rose-150 shadow-sm flex-1 flex flex-col justify-between">
+            <h3 class="text-[10px] font-black text-rose-400 uppercase tracking-widest mb-3">Danh sách phần tử (<span id="handbook-list-count">0</span>)</h3>
+            <div id="handbook-items-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-3 overflow-y-auto max-h-[380px] pr-1 flex-1"></div>
+          </div>
+        </div>
+
+        <!-- Detail views right -->
+        <div class="lg:col-span-5 flex flex-col space-y-4">
+          <!-- Detail active box -->
+          <div id="handbook-detail-panel" class="bg-gradient-to-br from-rose-50 via-white to-pink-50 p-6 rounded-3xl border border-rose-200 shadow-sm relative overflow-hidden flex-1 flex flex-col justify-between min-h-[320px]">
+            <div class="absolute right-0 top-0 translate-x-1/4 -translate-y-1/4 w-24 h-24 bg-rose-200/10 rounded-full blur-xl"></div>
+            <div class="space-y-4">
+              <div class="flex justify-between items-start border-b border-rose-100 pb-3">
+                <div class="font-sans">
+                  <span id="detail-type-badge" class="text-[9px] font-bold px-2 py-0.5 rounded-full bg-teal-100 text-teal-800">nguyên tố</span>
+                  <h3 id="detail-name" class="text-lg font-black font-display text-rose-950 mt-1.5"></h3>
+                  <p id="detail-category" class="text-[10px] text-amber-900/60"></p>
+                </div>
+                <div class="bg-gradient-to-tr from-pink-400 to-rose-450 text-white w-12 h-12 rounded-xl flex flex-col justify-center items-center font-display shadow-sm select-none shrink-0 scale-102">
+                  <span class="text-[8px] uppercase font-bold text-rose-100 leading-none">Valence</span>
+                  <span id="detail-val-roman" class="text-base font-black tracking-tighter block mt-0.5 leading-none"></span>
+                </div>
+              </div>
+
+              <!-- Large symbol stats -->
+              <div class="bg-white p-3.5 rounded-2xl border border-rose-200/50 flex items-center justify-between font-sans">
+                <div>
+                  <p class="text-[9px] text-stone-400 font-bold uppercase leading-none mb-1">Ký hiệu</p>
+                  <span id="detail-symbol" class="text-2xl font-black font-display text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-pink-500"></span>
+                </div>
+                <div class="text-right">
+                  <p class="text-[9px] text-stone-400 font-bold uppercase leading-none mb-1.5">Hóa trị dạng số</p>
+                  <div id="detail-valences-digits" class="flex gap-1 justify-end"></div>
+                </div>
+              </div>
+
+              <!-- Science info -->
+              <div class="space-y-1.5 font-sans">
+                <div class="flex items-center space-x-1 text-pink-600 font-bold text-[10px]">
+                  <i data-lucide="info" class="w-3.5 h-3.5 leading-none"></i> <span>Mô tả khoa học</span>
+                </div>
+                <p id="detail-desc" class="text-[11px] text-stone-700 bg-white/70 p-3 rounded-xl border border-rose-100 border-dashed leading-normal"></p>
+              </div>
+
+              <!-- Tip -->
+              <div id="detail-tip-box" class="bg-gradient-to-r from-amber-50 to-orange-50/50 border border-amber-200/60 p-3.5 rounded-xl space-y-1">
+                <div class="flex items-center space-x-1 text-[10px] text-amber-700 font-bold">
+                  <span>✨ Thần chú ghi nhớ nhanh</span>
+                </div>
+                <p id="detail-tip" class="text-[11px] italic text-amber-900 leading-normal"></p>
+              </div>
+            </div>
+
+            <!-- Quote details footer -->
+            <div class="border-t border-rose-150 pt-3 flex items-center space-x-1.5 text-[9px] text-rose-400 italic">
+              <span>🍓</span> <p id="detail-punchline"></p>
+            </div>
+          </div>
+
+          <!-- Mnemonic Poem Card static -->
+          <div class="bg-white p-5 rounded-3xl border border-rose-150 shadow-sm space-y-3">
+            <h4 class="text-xs font-bold text-purple-950 font-display flex items-center space-x-1.5">
+              <span>📖 Bí Kíp: Bài Ca Hóa Trị THPT</span>
+            </h4>
+            <p class="text-[10px] text-amber-900/50 leading-relaxed font-sans">Thơ ca dân gian quen thuộc truyền tai nhau muôn thế hệ giúp bạn thâu tóm toàn bộ hóa trị kỳ công.</p>
+            <div id="mnemonic-poem-list" class="bg-purple-50/50 rounded-2xl p-4 border border-purple-100 space-y-2 max-h-[160px] overflow-y-auto"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 6. ACHIEVEMENTS SCREEN -->
+      <section id="screen-achievements" class="screen-view hidden space-y-6">
+        <!-- Progress dashboard board -->
+        <div class="bg-gradient-to-br from-rose-50 via-white to-pink-50 p-6 rounded-3xl border border-rose-200 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6 relative overflow-hidden">
+          <div class="absolute right-0 bottom-0 translate-x-1/4 translate-y-1/4 w-28 h-28 bg-purple-200/10 rounded-full blur-xl"></div>
+          <div class="space-y-2 flex-1 w-full text-center md:text-left font-sans">
+            <div class="flex items-center justify-center md:justify-start space-x-2 text-rose-600">
+              <i data-lucide="trophy" class="w-5 h-5 text-yellow-500 fill-yellow-105"></i>
+              <h2 class="text-lg font-bold font-display">Khu Vườn Danh Hiệu</h2>
+            </div>
+            <p class="text-xs text-amber-900/60 leading-relaxed max-w-lg">Vượt qua các cột mốc thử thách ngọt ngào để thu hoạch gieo trồng các huy chương lộng lẫy.</p>
+            <!-- Progress meters -->
+            <div class="pt-2">
+              <div class="flex justify-between text-[10px] text-amber-900/60 font-semibold mb-1">
+                <span>Trồng thành công: <span id="unlocked-badge-count">0</span> / 6 huy chương</span>
+                <span id="badge-percent-meter">0%</span>
+              </div>
+              <div class="w-full h-2 bg-stone-100 rounded-full overflow-hidden border border-rose-100 p-0.5">
+                <div id="badge-progress-bar" class="h-full bg-gradient-to-r from-rose-400 to-purple-400 rounded-full transition-all duration-700 w-0"></div>
+              </div>
+            </div>
+          </div>
+          <!-- Badge ranking card -->
+          <div class="bg-white p-4 rounded-2xl border border-rose-150 shadow-sm flex flex-col items-center justify-center text-center w-36 shrink-0 scale-102">
+            <span class="text-4xl animate-bounce">🏆</span>
+            <span class="text-[9px] text-stone-400 font-bold block mt-1 leading-none">XẾP HẠNG</span>
+            <span id="rank-badge-text" class="text-[11px] font-black font-display text-rose-900 mt-1 leading-tight">Hạt Mầm Thơ Ngây</span>
+          </div>
+        </div>
+
+        <!-- Badges grid -->
+        <div id="achievements-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4"></div>
+      </section>
+    </main>
+
+    <!-- FOOTER LICENSE -->
+    <footer class="text-center text-[10px] text-stone-400 py-6 border-t border-rose-100/30 max-w-7xl mx-auto w-full select-none" id="app-footer">
+      <span>Vườn Hoa Hóa Trị THPT • Học Thần Tốc Nhớ Dài Lâu • Kính chúc cậu thi đại học điểm tuyệt đối 🌸</span>
+    </footer>
+
+    <!-- EMBEDDED ENGINE SCRIPTS BLOCK -->
+    <script>
+      // 1. DATASETS
+      const ELEMENTS_DATA = [
+        {id:'h', name:'Hiđrô', symbol:'H', valences:[1], type:'element', valenceText:'I', category:'Phi kim', description:'Nguyên tố nhẹ nhất vũ trụ, luôn có hóa trị I.', chemistryTip:'Kali, Iốt, Natri với Bạc, Clo một loài là hóa trị I cô ơi!'},
+        {id:'li', name:'Liti', symbol:'Li', valences:[1], type:'element', valenceText:'I', category:'Kim loại kiềm', description:'Kim loại nhẹ nhất, thuộc nhóm IA, có hóa trị I đặc trưng.', chemistryTip:'Liti cùng nhóm với Natri và Kali nên mang hóa trị I.'},
+        {id:'na', name:'Natri', symbol:'Na', valences:[1], type:'element', valenceText:'I', category:'Kim loại kiềm', description:'Cháy với ngọn lửa màu vàng đặc trưng, hóa trị I duy nhất.', chemistryTip:'Natri hóa trị I, gặp nước phản ứng sủi bọt mãnh liệt.'},
+        {id:'k', name:'Kali', symbol:'K', valences:[1], type:'element', valenceText:'I', category:'Kim loại kiềm', description:'Kim loại kiềm cực hoạt động hóa trị I.', chemistryTip:'Kali nằm ở đầu bài ca hóa trị, hóa trị I.'},
+        {id:'ag', name:'Bạc', symbol:'Ag', valences:[1], type:'element', valenceText:'I', category:'Kim loại', description:'Kim loại dẫn điện tốt nhất, có hóa trị I.', chemistryTip:'Bạc kết tủa AgCl trắng tinh khôi, hóa trị I.'},
+        {id:'o', name:'Oxi', symbol:'O', valences:[2], type:'element', valenceText:'II', category:'Phi kim', description:'Duy trì sự sống và sự cháy, luôn mang hóa trị II làm chuẩn so sánh.', chemistryTip:'Oxi hóa trị II quen thuộc để tính hóa trị các nguyên tố khác.'},
+        {id:'mg', name:'Magiê', symbol:'Mg', valences:[2], type:'element', valenceText:'II', category:'Kim loại kiềm thổ', description:'Cháy tỏa năng lượng ánh sáng cực mạnh, hóa trị II.', chemistryTip:'Magiê thuộc nhóm IIA luôn mang hóa trị II cố định.'},
+        {id:'ca', name:'Canxi', symbol:'Ca', valences:[2], type:'element', valenceText:'II', category:'Kim loại kiềm thổ', description:'Thành phần cấu tạo nên xương, răng và vỏ sò, hóa trị II.', chemistryTip:'Canxi hóa trị II, giúp xương chắc khỏe dẻo dai.'},
+        {id:'ba', name:'Bari', symbol:'Ba', valences:[2], type:'element', valenceText:'II', category:'Kim loại kiềm thổ', description:'Tạo kết tủa trắng BaSO₄ bền vững không tan trong axit mạnh, hóa trị II.', chemistryTip:'Bari hóa trị II, tạo kết tủa trắng đẹp đẽ với Sunfat.'},
+        {id:'zn', name:'Kẽm', symbol:'Zn', valences:[2], type:'element', valenceText:'II', category:'Kim loại', description:'Kim loại lưỡng tính chống gỉ sét hiệu quả, hóa trị II.', chemistryTip:'Kẽm hóa trị II ổn định không bao giờ thay đổi.'},
+        {id:'al', name:'Nhôm', symbol:'Al', valences:[3], type:'element', valenceText:'III', category:'Kim loại', description:'Kim loại phổ biến nhất vỏ Trái đất, hóa trị III đặc trưng.', chemistryTip:'Nhôm hóa trị III duy nhất, quen thuộc trong đồ gia dụng.'},
+        {id:'fe', name:'Sắt', symbol:'Fe', valences:[2,3], type:'element', valenceText:'II, III', category:'Kim loại chuyển tiếp', description:'Nguyên tố cốt lõi ngành luyện kim. Có hai hóa trị phổ biến II (Sắt II) và III (Sắt III).', chemistryTip:'Sắt tác dụng axit HCl ra hóa trị II, tác dụng khí Clo ra hóa trị III.'},
+        {id:'cu', name:'Đồng', symbol:'Cu', valences:[1,2], type:'element', valenceText:'I, II', category:'Kim loại chuyển tiếp', description:'Kim loại màu đỏ cam rực rỡ, thường có hóa trị II (màu xanh lam) và đôi khi hóa trị I.', chemistryTip:'Đồng thường hóa trị II lôi cuốn với dung dịch màu xanh dịu.'},
+        {id:'c', name:'Cacbon', symbol:'C', valences:[2,4], type:'element', valenceText:'II, IV', category:'Phi kim', description:'Trọng tâm sự sống và hóa hữu cơ, có hóa trị II trong CO và IV trong CO₂.', chemistryTip:'Cacbon hóa trị II và IV, tạo cấu trúc kim cương siêu bền.'},
+        {id:'s', name:'Lưu huỳnh', symbol:'S', valences:[2,4,6], type:'element', valenceText:'II, IV, VI', category:'Phi kim', description:'Màu vàng tươi sáng dập dờn. Có hóa trị II trong H₂S, IV trong SO₂ và VI trong H₂SO₄.', chemistryTip:'Lưu huỳnh chẵn chục hai bốn sáu biến ảo tự nhiên.'}
+      ];
+
+      const RADICALS_DATA = [
+        {id:'oh', name:'Hiđrôxit', symbol:'OH', valences:[1], type:'radical', valenceText:'I', category:'Gốc kiềm', description:'Gốc kiềm đặc trưng, kết hợp ion kim loại tạo bazo.', chemistryTip:'Hiđrôxit (OH) hiền dịu hóa trị I.'},
+        {id:'no3', name:'Nitrat', symbol:'NO₃', valences:[1], type:'radical', valenceText:'I', category:'Gốc axit hóa trị I', description:'Tất cả muối nitrat đều tan rất tốt trong nước.', chemistryTip:'Nitrat (NO₃) đỏng đảnh hóa trị I luôn tan cực nhanh.'},
+        {id:'so4', name:'Sunfat', symbol:'SO₄', valences:[2], type:'radical', valenceText:'II', category:'Gốc axit hóa trị II', description:'Gốc của axit vua H₂SO₄, tạo kết tủa trắng đẹp đẽ với Bari.', chemistryTip:'Sunfat (SO₄) mạnh mẽ kiên cường mang hóa trị II.'},
+        {id:'co3', name:'Cacbonat', symbol:'CO₃', valences:[2], type:'radical', valenceText:'II', category:'Gốc axit hóa trị II', description:'Gốc tạo đá vôi và phấn học sinh, sủi bọt CO₂ khi chạm axit.', chemistryTip:'Cacbonat (CO₃) sủi bọt lãng mạn hóa trị II.'},
+        {id:'po4', name:'Photphat', symbol:'PO₄', valences:[3], type:'radical', valenceText:'III', category:'Gốc axit hóa trị III', description:'Gốc axit của H₃PO₄, tạo kết tủa vàng ngọc ngà Ag₃PO₄.', chemistryTip:'Photphat (PO₄) hoàng gia quyền lực hóa trị III độc bản.'}
+      ];
+
+      const ALL_CHEMICALS_DATA = [...ELEMENTS_DATA, ...RADICALS_DATA];
+
+      const MNEMONIC_POEM = [
+        {line: "Kali, Iốt, Natri", comment: "Cùng Bạc, Clo một loài hóa trị I"},
+        {line: "Là hóa trị một em ơi", comment: "Nhớ ghi cho rõ kẻo rồi phân vân"},
+        {line: "Magiê, Kẽm với Bari", comment: "Canxi, Đồng ấy đều hóa trị II"},
+        {line: "Oxi, Thủy ngân cũng thế thôi", comment: "Nhôm đây hóa trị III lăng nhăng chút gì"},
+        {line: "Cacbon, Silic này đây", comment: "Có thêm hóa trị IV thực là chẳng sai"},
+        {line: "Sắt kia kể cũng đa tài", comment: "Hóa trị II, III dễ dượt hoài không ngơi"},
+        {line: "Lưu huỳnh chẵn chục thế này", comment: "Hai, bốn và sáu lên mau tuyệt vời!"}
+      ];
+
+      const DEFAULT_ACHIEVEMENTS = [
+        {id: 'first_quiz_win', title: 'Hoa Đầu Mùa', description: 'Hoàn thành lượt đố vui đầu tiên xuất sắc.', icon: '🌱', requirementText: 'Trả lời đúng ít nhất 1 câu trong Chế độ Đố Vui.'},
+        {id: 'perfect_streak', title: 'Nữ Thần Hóa Học', description: 'Đạt chuỗi trả lời đúng 5 câu liên tiếp.', icon: '👑', requirementText: 'Trả lời đúng liên tiếp 5 câu hỏi.'},
+        {id: 'fast_matcher', title: 'Kỷ Lục Ma Thuật', description: 'Hoàn thành kết đôi ma thuật dưới 45 giây.', icon: '⚡', requirementText: 'Ghép thành công mọi cặp thẻ bài dưới 45 giây.'},
+        {id: 'sorter_champion', title: 'Chuyên Gia Lọ Phép', description: 'Sắp xếp chuẩn xác 10 nguyên tố/gốc liên tục vào lọ hóa trị.', icon: '✨', requirementText: 'Sắp xếp chuẩn không sai sót 10 vật phẩm liên tiếp.'},
+        {id: 'survivor', title: 'Trái Tim Bền Bỉ', description: 'Đạt điểm số lớn trong đố vui mà không mất trái tim nào.', icon: '💖', requirementText: 'Trả lời đúng 10 câu với 3 tim nguyên vẹn.'},
+        {id: 'bookworm', title: 'Học Giả Vườn Hoa', description: 'Mở xem sổ tay hóa học và tra cứu ít nhất 5 chất.', icon: '📖', requirementText: 'Truy cập tab Sổ Tay và đọc kiến thức trên 5 chất.'}
+      ];
+
+      const CHEMISTRY_PUNS_AND_MESSAGES = [
+        "Cậu có biết? Tình yêu tớ dành cho cậu tỏa nhiệt tựa phản ứng giữa Natri và nước mát vậy đó! 💧💥",
+        "Nước mắt cậu rơi làm lòng tớ kết tủa tựa BaSO₄ không tan trong mọi nỗi niềm... 🌧️🤍",
+        "Hôm nay trông cậu rạng ngời như ánh lửa hồng khi đốt muối Canxi vậy, siêu ấm áp! 🔥✨",
+        "Tình bạn chúng mình bền chặt như liên kết cộng hóa trị, đập không vỡ phân không rời! 🌸💖",
+        "Hãy cùng tớ dung hòa áp lực bằng nụ cười tỏa hương như este thơm ngọt nhé! 🍓🧁"
+      ];
+
+      // 2. STATE MANAGER
+      let state = {
+        activeScreen: 'home',
+        achievements: [],
+        highScores: { quiz: 0, match: 0, sort: 0 },
+        history: [],
+        viewedItems: [], // for bookworm badge
+        points: 0
+      };
+
+      // INIT
+      window.onload = function() {
+        // Load quotes
+        document.getElementById('home-quote').innerText = "✿ " + CHEMISTRY_PUNS_AND_MESSAGES[Math.floor(Math.random() * CHEMISTRY_PUNS_AND_MESSAGES.length)];
+        
+        // Load storage
+        try {
+          const savedAch = localStorage.getItem('chem_garden_ach_html');
+          if (savedAch) {
+            state.achievements = JSON.parse(savedAch);
+          } else {
+            state.achievements = DEFAULT_ACHIEVEMENTS.map(a => ({...a, isUnlocked: false, unlockedAt: ''}));
+          }
+          
+          const savedScores = localStorage.getItem('chem_garden_scores_html');
+          if (savedScores) state.highScores = JSON.parse(savedScores);
+
+          const savedHistory = localStorage.getItem('chem_garden_history_html');
+          if (savedHistory) state.history = JSON.parse(savedHistory);
+        } catch(e) {
+          state.achievements = DEFAULT_ACHIEVEMENTS.map(a => ({...a, isUnlocked: false, unlockedAt: ''}));
+        }
+
+        recalcPoints();
+        updateScoresUI();
+        renderHistory();
+        renderMnemonicStatic();
+        filterHandbook('all');
+        selectHandbookItem(ALL_CHEMICALS_DATA[0].id);
+        
+        lucide.createIcons();
+      };
+
+      function recalcPoints() {
+        let total = 0;
+        state.history.forEach(h => {
+          total += (h.mode !== 'match' ? h.score : 30);
+        });
+        state.points = total;
+        document.getElementById('header-points').innerText = total;
+        document.getElementById('hero-points').innerText = total + " pt";
+      }
+
+      function updateScoresUI() {
+        document.getElementById('record-quiz').innerText = `Kỷ lục: ${state.highScores.quiz} pt`;
+        document.getElementById('record-match').innerText = `Kỷ lục: ${state.highScores.match} pt`;
+        document.getElementById('record-sort').innerText = `Kỷ lục: ${state.highScores.sort} pt`;
+      }
+
+      function renderHistory() {
+        const list = document.getElementById('history-list');
+        if (state.history.length === 0) {
+          list.innerHTML = `<div class="text-stone-400 italic text-center py-6 text-[11px]">Chưa lưu ván chơi nào hôm nay hết. Nhấn chọn game chơi đi nha cậu! 🌸</div>`;
+          return;
+        }
+
+        let html = '';
+        state.history.slice(0, 10).forEach(h => {
+          const modeLabel = h.mode === 'quiz' ? 'Đố Vui' : h.mode === 'match' ? 'Kết Đôi' : 'Lọ Thả';
+          html += `
+            <div class="flex items-center justify-between border-b border-rose-50 pb-1.5 last:border-b-0 text-[10px]">
+              <div>
+                <span class="font-bold text-neutral-800">${modeLabel} Hoa Trị</span>
+                <span class="text-[9px] text-stone-400 block">${h.date}</span>
+              </div>
+              <div class="text-right">
+                <span class="font-mono font-bold text-rose-600">+${h.score}đ</span>
+                <span class="text-[8px] text-stone-400 block">Khớp: ${h.accuracy}%</span>
+              </div>
+            </div>
+          `;
+        });
+        list.innerHTML = html;
+      }
+
+      function saveScore(mode, score, accuracy) {
+        const entry = {
+          date: new Date().toLocaleDateString('vi-VN'),
+          score: score,
+          mode: mode,
+          accuracy: accuracy
+        };
+        state.history.unshift(entry);
+        state.history = state.history.slice(0, 20);
+        localStorage.setItem('chem_garden_history_html', JSON.stringify(state.history));
+
+        if (mode === 'quiz' && score > state.highScores.quiz) state.highScores.quiz = score;
+        if (mode === 'sort' && score > state.highScores.sort) state.highScores.sort = score;
+        if (mode === 'match' && (score > state.highScores.match || state.highScores.match === 0)) state.highScores.match = score;
+
+        localStorage.setItem('chem_garden_scores_html', JSON.stringify(state.highScores));
+        
+        recalcPoints();
+        updateScoresUI();
+        renderHistory();
+      }
+
+      function showToast(msg) {
+        const container = document.getElementById('toast-container');
+        const text = document.getElementById('toast-msg');
+        text.innerText = msg;
+        container.classList.remove('hidden');
+        container.classList.add('animate-float-toast');
+        setTimeout(() => {
+          container.classList.add('hidden');
+          container.classList.remove('animate-float-toast');
+        }, 4500);
+      }
+
+      function unlockAchievement(id) {
+        const ach = state.achievements.find(a => a.id === id);
+        if (ach && !ach.isUnlocked) {
+          ach.isUnlocked = true;
+          ach.unlockedAt = new Date().toLocaleTimeString('vi-VN', {hour:'2-digit', minute:'2-digit'}) + ' ' + new Date().toLocaleDateString('vi-VN');
+          localStorage.setItem('chem_garden_ach_html', JSON.stringify(state.achievements));
+          showToast(`🎉 Cậu vừa đạt Huy Chương mới: "${ach.title}" 🌸`);
+        }
+      }
+
+      // 3. NAVIGATION SYSTEM
+      function navigate(screenName) {
+        state.activeScreen = screenName;
+        // Hide all screens
+        ['home', 'quiz', 'match', 'sort', 'handbook', 'achievements'].forEach(s => {
+          document.getElementById(`screen-${s}`).classList.add('hidden');
+          
+          // nav highlights
+          const btn = document.getElementById(`btn-${s}`);
+          if (btn) btn.className = "px-3.5 py-1.5 rounded-full font-bold transition-all";
+          
+          const mBtn = document.getElementById(`m-btn-${s}`);
+          if (mBtn) mBtn.className = "flex flex-col items-center p-1 cursor-pointer transition-all text-stone-400";
+        });
+
+        // Show active
+        document.getElementById(`screen-${screenName}`).classList.remove('hidden');
+        
+        const actBtn = document.getElementById(`btn-${screenName}`);
+        if (actBtn) actBtn.className = "bg-gradient-to-r from-rose-400 to-pink-500 text-white px-3.5 py-1.5 rounded-full font-bold transition-all shadow-sm";
+        
+        const mActBtn = document.getElementById(`m-btn-${screenName}`);
+        if (mActBtn) mActBtn.className = "flex flex-col items-center p-1 cursor-pointer transition-all text-rose-600 scale-105 font-bold";
+
+        // Custom screen initializations
+        if (screenName === 'achievements') renderAchievementsList();
+        if (screenName === 'handbook') {
+          filterHandbook('all');
+          // Award achievement for handbook visit
+          state.viewedItems.push('visit');
+          checkBookworm();
+        }
+
+        // Reset any playing games
+        stopAllGameTimers();
+
+        lucide.createIcons();
+      }
+
+      function stopAllGameTimers() {
+        if (quizEngine.timer) clearInterval(quizEngine.timer);
+        if (matchEngine.timer) clearInterval(matchEngine.timer);
+        if (sortEngine.timer) clearInterval(sortEngine.timer);
+        // Reset sub displays
+        document.getElementById('quiz-intro').classList.remove('hidden');
+        document.getElementById('quiz-arena').classList.add('hidden');
+        document.getElementById('quiz-revive').classList.add('hidden');
+        document.getElementById('quiz-summary').classList.add('hidden');
+
+        document.getElementById('match-intro').classList.remove('hidden');
+        document.getElementById('match-arena').classList.add('hidden');
+        document.getElementById('match-summary').classList.add('hidden');
+
+        document.getElementById('sort-intro').classList.remove('hidden');
+        document.getElementById('sort-arena').classList.add('hidden');
+        document.getElementById('sort-summary').classList.add('hidden');
+      }
+
+      // 4. HANDBOOK CODE
+      let activeHandbookFilter = 'all';
+      let searchHandbookTerm = '';
+
+      function filterHandbook(filterType) {
+        activeHandbookFilter = filterType;
+        ['all', 'element', 'radical'].forEach(t => {
+          const b = document.getElementById(`filter-${t}`);
+          if (t === filterType) {
+            b.className = "px-3.5 py-1.5 rounded-full font-bold bg-gradient-to-r from-rose-400 to-pink-500 text-white cursor-pointer select-none";
+          } else {
+            b.className = "px-3.5 py-1.5 rounded-full font-bold bg-rose-50/50 border border-garden-pink/30 hover:border-garden-pink text-rose-700 cursor-pointer select-none";
+          }
+        });
+        renderHandbookList();
+      }
+
+      function searchHandbook(val) {
+        searchHandbookTerm = val.toLowerCase().trim();
+        renderHandbookList();
+      }
+
+      function renderHandbookList() {
+        document.getElementById('count-all').innerText = ALL_CHEMICALS_DATA.length;
+        document.getElementById('count-elements').innerText = ELEMENTS_DATA.length;
+        document.getElementById('count-radicals').innerText = RADICALS_DATA.length;
+
+        const filtered = ALL_CHEMICALS_DATA.filter(item => {
+          const matchesSearch = item.name.toLowerCase().includes(searchHandbookTerm) || 
+                                item.symbol.toLowerCase().includes(searchHandbookTerm) || 
+                                item.valenceText.toLowerCase().includes(searchHandbookTerm);
+          const matchesFilter = activeHandbookFilter === 'all' ? true : item.type === activeHandbookFilter;
+          return matchesSearch && matchesFilter;
+        });
+
+        document.getElementById('handbook-list-count').innerText = filtered.length;
+        const grid = document.getElementById('handbook-items-grid');
+        
+        if (filtered.length === 0) {
+          grid.innerHTML = `<div class="col-span-full text-center py-10 text-stone-400 text-xs">Không tìm thấy chất nào cả! Thử gõ từ khóa khác nhé 🌻</div>`;
+          return;
+        }
+
+        let html = '';
+        filtered.forEach(item => {
+          const itemStyles = item.type === 'element' 
+            ? 'bg-teal-50/45 border-teal-100 hover:border-teal-300 text-teal-950' 
+            : 'bg-indigo-50/45 border-indigo-100 hover:border-indigo-300 text-indigo-950';
+          html += `
+            <div onclick="selectHandbookItem('${item.id}')" id="hb-item-${item.id}" class="p-3 rounded-2xl border-2 transition-all cursor-pointer flex flex-col justify-between ${itemStyles}">
+              <div class="flex justify-between items-start">
+                <span class="text-xl font-black font-display leading-none">${item.symbol}</span>
+                <span class="text-[9px] font-bold px-1.5 py-0.5 rounded-md ${item.type === 'element'?'bg-teal-100 text-teal-800':'bg-indigo-100 text-indigo-800'}">${item.valenceText}</span>
+              </div>
+              <div class="mt-2.5">
+                <span class="text-xs font-bold block truncate leading-none mb-1">${item.name}</span>
+                <span class="text-[9px] text-stone-400 block">${item.category}</span>
+              </div>
+            </div>
+          `;
+        });
+        grid.innerHTML = html;
+      }
+
+      function selectHandbookItem(id) {
+        const item = ALL_CHEMICALS_DATA.find(i => i.id === id);
+        if (!item) return;
+
+        // Highlight selected inside list
+        ALL_CHEMICALS_DATA.forEach(i => {
+          const card = document.getElementById(`hb-item-${i.id}`);
+          if (card) {
+            card.classList.remove('ring-2', 'ring-rose-400', 'bg-rose-50/50');
+          }
+        });
+        const activeCard = document.getElementById(`hb-item-${id}`);
+        if (activeCard) {
+          activeCard.classList.add('ring-2', 'ring-rose-400', 'bg-rose-50/50');
+        }
+
+        // Fill detail
+        document.getElementById('detail-type-badge').innerText = item.type === 'element' ? 'Nguyên Tố Hóa Học' : 'Gốc Axit (Gốc Muối)';
+        document.getElementById('detail-type-badge').className = `text-[9px] font-bold px-2 py-0.5 rounded-full ${item.type === 'element' ? 'bg-teal-100 text-teal-800' : 'bg-indigo-100 text-indigo-800'}`;
+        document.getElementById('detail-name').innerText = item.name;
+        document.getElementById('detail-category').innerText = item.category;
+        document.getElementById('detail-val-roman').innerText = item.valenceText;
+        document.getElementById('detail-symbol').innerText = item.symbol;
+        document.getElementById('detail-desc').innerText = item.description;
+        
+        let valDigits = '';
+        item.valences.forEach(v => {
+          valDigits += `<span class="bg-purple-100 text-purple-700 text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center">${v}</span>`;
+        });
+        document.getElementById('detail-valences-digits').innerHTML = valDigits;
+
+        if (item.chemistryTip) {
+          document.getElementById('detail-tip-box').classList.remove('hidden');
+          document.getElementById('detail-tip').innerText = `"${item.chemistryTip}"`;
+        } else {
+          document.getElementById('detail-tip-box').classList.add('hidden');
+        }
+        
+        document.getElementById('detail-punchline').innerText = CHEMISTRY_PUNS_AND_MESSAGES[Math.floor(id.charCodeAt(0) % CHEMISTRY_PUNS_AND_MESSAGES.length)];
+
+        // Badge track
+        if (!state.viewedItems.includes(id)) {
+          state.viewedItems.push(id);
+          checkBookworm();
+        }
+      }
+
+      function checkBookworm() {
+        const reads = state.viewedItems.filter(x => x !== 'visit' && x !== 'poem');
+        if (reads.length >= 5) {
+          unlockAchievement('bookworm');
+        }
+      }
+
+      function renderMnemonicStatic() {
+        const container = document.getElementById('mnemonic-poem-list');
+        let html = '';
+        MNEMONIC_POEM.forEach((p, idx) => {
+          html += `
+            <div class="flex flex-col text-[10px] border-b border-purple-100/30 pb-1.5 last:border-b-0">
+              <span class="font-bold text-purple-950">✿ ${p.line}</span>
+              <span class="text-[9px] text-amber-900/60 ml-2 italic">➔ ${p.comment}</span>
+            </div>
+          `;
+        });
+        container.innerHTML = html;
+        container.onclick = function() {
+          state.viewedItems.push('poem');
+          checkBookworm();
+        };
+      }
+
+      // 5. ACHIEVEMENTS RENDERER
+      function renderAchievementsList() {
+        const unlockedCount = state.achievements.filter(a => a.isUnlocked).length;
+        const percent = Math.round((unlockedCount / DEFAULT_ACHIEVEMENTS.length) * 100);
+        
+        document.getElementById('unlocked-badge-count').innerText = unlockedCount;
+        document.getElementById('badge-percent-meter').innerText = percent + "%";
+        document.getElementById('badge-progress-bar').style.width = percent + "%";
+
+        let rankTitle = 'Hạt Mầm Thơ Ngây';
+        if (unlockedCount === DEFAULT_ACHIEVEMENTS.length) rankTitle = 'Nữ Hoàng Hóa Học 👑';
+        else if (unlockedCount >= 4) rankTitle = 'Học Giả Ưu Tú 🌸';
+        else if (unlockedCount >= 1) rankTitle = 'Tập Sự Vườn Sân 🌱';
+        document.getElementById('rank-badge-text').innerText = rankTitle;
+
+        const grid = document.getElementById('achievements-grid');
+        let html = '';
+        state.achievements.forEach(ach => {
+          const badgeBox = ach.isUnlocked 
+            ? 'bg-rose-50 border-rose-100 text-rose-500' 
+            : 'bg-stone-100 border-stone-200 text-stone-400';
+          const outerBox = ach.isUnlocked 
+            ? 'bg-white border-garden-pink shadow-xs'
+            : 'bg-stone-50/50 border-stone-200 opacity-70';
+
+          html += `
+            <div class="p-5 rounded-3xl border-2 transition-all relative overflow-hidden flex flex-col justify-between min-h-[160px] ${outerBox}">
+              <div class="space-y-3">
+                <div class="flex justify-between items-start">
+                  <div class="w-10 h-10 rounded-xl flex items-center justify-center text-xl border ${badgeBox}">
+                    ${ach.isUnlocked ? ach.icon : '🔒'}
+                  </div>
+                  <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${ach.isUnlocked ? 'bg-emerald-100 text-emerald-800' : 'bg-stone-100 text-stone-500'}">
+                    ${ach.isUnlocked ? 'Đã Đạt' : 'Đang Khóa'}
+                  </span>
+                </div>
+                <div>
+                  <h4 class="text-xs font-extrabold text-rose-950 font-display">${ach.title}</h4>
+                  <p class="text-[11px] text-amber-900/70 mt-1">${ach.description}</p>
+                </div>
+              </div>
+              <div class="border-t border-dashed border-stone-100 pt-2 mt-2 text-[9px] text-stone-400 italic">
+                ${ach.isUnlocked ? `Mở khóa: ${ach.unlockedAt}` : `Yêu cầu: ${ach.requirementText}`}
+              </div>
+            </div>
+          `;
+        });
+        grid.innerHTML = html;
+      }
+
+      // 6. QUIZ GAME CORE ENGINE
+      let quizEngine = {
+        questions: [],
+        currentIdx: 0,
+        score: 0,
+        streak: 0,
+        maxStreak: 0,
+        lives: 3,
+        timeLeft: 30,
+        timer: null,
+        selectedAns: null,
+        isAnswered: false,
+        reviveItem: null,
+        reviveAns: null
+      };
+
+      const FLOWER_STAGES = [
+        {text: "Hạt mầm bé bỏng", desc: "Đang ủ mình đợi những hạt nắng đáp án đúng của cậu...", emoji: "🌱"},
+        {text: "Chồi non hé mở", desc: "Mầm xanh nhú vai chào nắng ấm ngọt ngào!", emoji: "🌿"},
+        {text: "Hai chiếc lá nhỏ", desc: "Thêm dinh dưỡng hóa trị để bừng sáng dẻo dai.", emoji: "☘️"},
+        {text: "Nụ hoa chớm nở", desc: "Hương hoa ngọt ngào e ấp chào gió say.", emoji: "🌷"},
+        {text: "Đoá hoa nở rộ lấp lánh!", desc: "Cậu tuyệt giỏi! Bông hoa hóa trị đã khai nở ngút ngàn hương thơm.", emoji: "🌸"}
+      ];
+
+      function startQuiz() {
+        document.getElementById('quiz-intro').classList.add('hidden');
+        document.getElementById('quiz-summary').classList.add('hidden');
+        document.getElementById('quiz-revive').classList.add('hidden');
+        document.getElementById('quiz-arena').classList.remove('hidden');
+
+        // Shuffler elements
+        const pool = [...ALL_CHEMICALS_DATA].sort(() => 0.5 - Math.random());
+        quizEngine.questions = pool.slice(0, 10).map((item, idx) => {
+          const corrects = item.valenceText;
+          const choices = [corrects];
+          const dists = ["I", "II", "III", "IV", "V", "VI", "II, III", "I, II"].filter(x => x !== corrects).sort(() => 0.5 - Math.random());
+          choices.push(...dists.slice(0, 3));
+          choices.sort(() => 0.5 - Math.random());
+
+          const subject = item.type === 'element' ? 'Nguyên tố' : 'Gốc muối (gốc axit)';
+          return {
+            item: item,
+            questionText: `${subject} "${item.name}" (Ký hiệu hóa học: ${item.symbol}) mang hóa trị hoặc dãy hóa trị thường gặp nào dưới đây?`,
+            options: choices,
+            answer: corrects,
+            explanation: item.chemistryTip || `${item.name} (${item.symbol}) mang hóa trị ${corrects}. ${item.description}`
+          };
+        });
+
+        quizEngine.currentIdx = 0;
+        quizEngine.score = 0;
+        quizEngine.streak = 0;
+        quizEngine.maxStreak = 0;
+        quizEngine.lives = 3;
+        quizEngine.timeLeft = 30;
+        quizEngine.isAnswered = false;
+        quizEngine.selectedAns = null;
+
+        drawFlowerStage(0);
+        showQuizQuestion();
+      }
+
+      function drawFlowerStage(scoreVal) {
+        let stageIdx = 0;
+        if (scoreVal >= 80) stageIdx = 4;
+        else if (scoreVal >= 55) stageIdx = 3;
+        else if (scoreVal >= 35) stageIdx = 2;
+        else if (scoreVal >= 15) stageIdx = 1;
+
+        const info = FLOWER_STAGES[stageIdx];
+        document.getElementById('flower-stage-text').innerText = info.text;
+        document.getElementById('flower-stage-desc').innerText = info.desc;
+
+        // Custom SVG drawing
+        const svg = document.getElementById('quiz-flower-svg');
+        let html = `
+          <!-- EARTH POT -->
+          <ellipse cx="50" cy="84" rx="20" ry="6" fill="#8D6E63" />
+          <path d="M 34,83 L 38,96 Q 50,99 62,96 L 66,83 Z" fill="#D7CCC8" stroke="#A1887F" stroke-width="1" />
+          <ellipse cx="50" cy="83" rx="16" ry="3" fill="#3E2723" />
+          <rect x="37" y="86" width="26" height="1.5" fill="#D81B60" rx="1" />
+        `;
+
+        if (stageIdx >= 1) {
+          // Draw stem
+          html += `<path d="M 50,82 L 50,52" stroke="#81C784" stroke-width="4.5" stroke-linecap="round" />`;
+        }
+        if (stageIdx >= 2) {
+          // Leaves
+          html += `
+            <path d="M 50,68 Q 36,63 32,58" fill="none" stroke="#66BB6A" stroke-width="3" stroke-linecap="round" />
+            <circle cx="32" cy="58" r="2.5" fill="#66BB6A" />
+            <path d="M 50,60 Q 64,55 68,52" fill="none" stroke="#66BB6A" stroke-width="3" stroke-linecap="round" />
+            <circle cx="68" cy="52" r="2.5" fill="#66BB6A" />
+          `;
+        }
+        if (stageIdx === 3) {
+          // Bud
+          html += `
+            <circle cx="50" cy="46" r="8" fill="#F48FB1" class="animate-pulse" />
+            <circle cx="50" cy="46" r="4.5" fill="#F06292" />
+          `;
+        }
+        if (stageIdx === 4) {
+          // Full gorgeous flower
+          html += `
+            <circle cx="50" cy="45" r="8" fill="#FFF" />
+            <circle cx="42" cy="45" r="9.5" fill="#F06292" opacity="0.85" />
+            <circle cx="58" cy="45" r="9.5" fill="#F06292" opacity="0.85" />
+            <circle cx="50" cy="37" r="9.5" fill="#F06292" opacity="0.85" />
+            <circle cx="50" cy="53" r="9.5" fill="#F06292" opacity="0.85" />
+            <circle cx="44" cy="39" r="8.5" fill="#FF8A08" opacity="0.7" />
+            <circle cx="56" cy="51" r="8.5" fill="#FF8A08" opacity="0.7" />
+            <circle cx="56" cy="39" r="8.5" fill="#FF8A08" opacity="0.7" />
+            <circle cx="44" cy="51" r="8.5" fill="#FF8A08" opacity="0.7" />
+            <circle cx="50" cy="45" r="6.5" fill="#FDD835" />
+            <circle cx="49" cy="44" r="2" fill="#FFF" />
+          `;
+        }
+        if (stageIdx === 0) {
+          // Seed emoji text
+          html += `<text x="50" y="73" text-anchor="middle" font-size="18" class="animate-pulse">🌱</text>`;
+        }
+        svg.innerHTML = html;
+      }
+
+      function showQuizQuestion() {
+        if (quizEngine.timer) clearInterval(quizEngine.timer);
+        quizEngine.isAnswered = false;
+        quizEngine.selectedAns = null;
+        quizEngine.timeLeft = 30;
+
+        document.getElementById('quiz-timer').innerText = "30";
+        document.getElementById('quiz-feedback-banner').classList.add('hidden');
+
+        // Lives indicators
+        const box = document.getElementById('hearts-box');
+        let heartHtml = '';
+        for (let i = 0; i < 3; i++) {
+          heartHtml += `<span class="text-lg transition-transform ${i < quizEngine.lives ? 'text-rose-500 animate-pulse' : 'text-stone-300'}">💖</span>`;
+        }
+        box.innerHTML = heartHtml;
+
+        const q = quizEngine.questions[quizEngine.currentIdx];
+        document.getElementById('quiz-progress-text').innerText = `Câu hỏi ${quizEngine.currentIdx+1} / 10`;
+        document.getElementById('quiz-category-badge').innerText = q.item.type === 'element' ? 'Nguyên Tố Kiêu Sa' : 'Gốc Axit Cốt Lõi';
+        document.getElementById('quiz-category-badge').className = `text-[9px] font-bold px-2 py-0.5 rounded-full ${q.item.type === 'element' ? 'bg-teal-100 text-teal-800' : 'bg-indigo-100 text-indigo-800'}`;
+        document.getElementById('quiz-question-text').innerText = q.questionText;
+        document.getElementById('quiz-big-symbol').innerText = q.item.symbol;
+        document.getElementById('quiz-item-name').innerText = q.item.name;
+
+        // Render options grid
+        const grid = document.getElementById('quiz-options-grid');
+        let optionsHtml = '';
+        q.options.forEach(opt => {
+          optionsHtml += `
+            <button onclick="submitQuizOption('${opt}')" class="py-3 px-4 rounded-2xl border bg-orange-50/10 hover:bg-rose-50/50 border-orange-200/50 hover:border-rose-400 font-semibold text-xs text-amber-950 transition-all cursor-pointer">
+              Hóa Trị ${opt}
+            </button>
+          `;
+        });
+        grid.innerHTML = optionsHtml;
+
+        // Timer launch
+        quizEngine.timer = setInterval(() => {
+          quizEngine.timeLeft--;
+          document.getElementById('quiz-timer').innerText = quizEngine.timeLeft;
+          if (quizEngine.timeLeft <= 0) {
+            clearInterval(quizEngine.timer);
+            submitQuizOption(""); // Timeout
+          }
+        }, 1000);
+      }
+
+      function submitQuizOption(option) {
+        if (quizEngine.isAnswered) return;
+        quizEngine.isAnswered = true;
+        if (quizEngine.timer) clearInterval(quizEngine.timer);
+
+        quizEngine.selectedAns = option;
+        const q = quizEngine.questions[quizEngine.currentIdx];
+        const isCorrect = option === q.answer;
+
+        const grid = document.getElementById('quiz-options-grid');
+        const buttons = grid.getElementsByTagName('button');
+
+        for (let i = 0; i < buttons.length; i++) {
+          const btn = buttons[i];
+          const btnVal = btn.innerText.replace('Hóa Trị', '').trim();
+          btn.disabled = true;
+
+          if (btnVal === q.answer) {
+            btn.className = "py-3 px-4 rounded-2xl border text-emerald-950 font-black text-xs bg-emerald-100 border-emerald-400 soft-glow-mint";
+          } else if (btnVal === option && !isCorrect) {
+            btn.className = "py-3 px-4 rounded-2xl border text-rose-950 font-bold text-xs bg-rose-100 border-rose-400 soft-glow-pink";
+          } else {
+            btn.className = "py-3 px-4 rounded-2xl border bg-stone-50 border-stone-200 text-stone-400 text-xs opacity-50";
+          }
+        }
+
+        // Streak & point multipliers
+        if (isCorrect) {
+          quizEngine.streak++;
+          if (quizEngine.streak > quizEngine.maxStreak) quizEngine.maxStreak = quizEngine.streak;
+          
+          const combo = Math.floor(quizEngine.streak / 3);
+          const pointsEarned = 10 + (combo * 5);
+          quizEngine.score += pointsEarned;
+          document.getElementById('quiz-active-points').innerText = quizEngine.score;
+
+          // Streak badges
+          if (quizEngine.streak >= 3) {
+            const streakBadge = document.getElementById('streak-badge');
+            streakBadge.innerText = `🔥 x${quizEngine.streak}`;
+            streakBadge.classList.remove('hidden');
+          }
+
+          // Trigger unlocks
+          unlockAchievement('first_quiz_win');
+          if (quizEngine.streak >= 5) unlockAchievement('perfect_streak');
+
+          document.getElementById('quiz-feedback-banner').className = "p-4 rounded-3xl border bg-gradient-to-r from-emerald-50 to-teal-50 border-emerald-300 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 mt-4 animate-bounce";
+          document.getElementById('feedback-smiley').innerText = "🌸";
+          document.getElementById('feedback-headline').innerText = "Cậu đỉnh thật đó! Đáp án siêu chuẩn.";
+          document.getElementById('feedback-headline').className = "font-bold text-emerald-900 leading-normal text-xs";
+          document.getElementById('feedback-explanation').innerText = q.explanation;
+
+          drawFlowerStage(quizEngine.score);
+        } else {
+          quizEngine.streak = 0;
+          document.getElementById('streak-badge').classList.add('hidden');
+          quizEngine.lives--;
+
+          document.getElementById('quiz-feedback-banner').className = "p-4 rounded-3xl border bg-gradient-to-r from-amber-50 to-orange-50 border-amber-300 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4 mt-4";
+          document.getElementById('feedback-smiley').innerText = "💡";
+          document.getElementById('feedback-headline').innerText = option === "" ? "Hết thời gian đếm ngược rồi nha!" : `Chưa đúng tẹo rồi! Đáp án là hóa trị ${q.answer}`;
+          document.getElementById('feedback-headline').className = "font-bold text-amber-900 leading-normal text-xs";
+          document.getElementById('feedback-explanation').innerText = q.explanation;
+        }
+
+        document.getElementById('quiz-next-btn-text').innerText = quizEngine.currentIdx + 1 >= 10 ? 'Xem Tổng Kết' : 'Hạt mầm sau';
+        lucide.createIcons();
+      }
+
+      function nextQuizQuestion() {
+        if (quizEngine.lives <= 0) {
+          // Ask for revive
+          prepareRevive();
+        } else if (quizEngine.currentIdx + 1 >= 10) {
+          endQuiz();
+        } else {
+          quizEngine.currentIdx++;
+          showQuizQuestion();
+        }
+      }
+
+      function prepareRevive() {
+        document.getElementById('quiz-arena').classList.add('hidden');
+        document.getElementById('quiz-revive').classList.remove('hidden');
+
+        // Find random True-False
+        const item = ALL_CHEMICALS_DATA[Math.floor(Math.random() * ALL_CHEMICALS_DATA.length)];
+        const isCorrectFact = Math.random() > 0.5;
+        let factVal = item.valenceText;
+        if (!isCorrectFact) {
+          const wPool = ["I", "II", "III", "IV"].filter(x => x !== item.valenceText);
+          factVal = wPool[Math.floor(Math.random() * wPool.length)];
+        }
+
+        quizEngine.reviveItem = item;
+        quizEngine.reviveAns = isCorrectFact;
+
+        document.getElementById('revive-symbol').innerText = item.symbol;
+        document.getElementById('revive-question-text').innerText = `Đúng hay Sai: "${item.name} (${item.symbol}) mang hóa trị ${factVal}"?`;
+      }
+
+      function answerRevive(userAns) {
+        if (userAns === quizEngine.reviveAns) {
+          quizEngine.lives = 2; // revive with 2 lives!
+          state.points += 20; // extra reward points
+          showToast("💖 Phép thuật hồi sinh hiệu nghiệm! Nhận thêm 2 trái tim và tiếp tục.");
+          document.getElementById('quiz-revive').classList.add('hidden');
+          document.getElementById('quiz-arena').classList.remove('hidden');
+          quizEngine.currentIdx++;
+          showQuizQuestion();
+        } else {
+          showToast("Thao tác cứu trợ chưa chính xác! Về bảng tổng kết nha cậu.");
+          endQuiz();
+        }
+      }
+
+      function endQuiz() {
+        document.getElementById('quiz-arena').classList.add('hidden');
+        document.getElementById('quiz-revive').classList.add('hidden');
+        document.getElementById('quiz-summary').classList.remove('hidden');
+
+        const score = quizEngine.score;
+        let title = 'Hạt mầm e ấp tìm nắng';
+        let advice = "Hạt mầm cần thêm ánh sáng học thuật. Đọc Sổ tay của tớ vài sườn nữa là làm bài ngọt sớt nha cậu!";
+        let emoji = '🌱';
+
+        if (score >= 80) {
+          title = 'Đoá hoa nở rực rỡ!';
+          advice = "Cậu xứng đáng là Nữ Thần Hóa Học! Kỳ thi tới chỉ mỉm cười nhận điểm 10 thôi nha.";
+          emoji = '🌸';
+          if (quizEngine.lives === 3) unlockAchievement('survivor');
+        } else if (score >= 45) {
+          title = 'Nụ hoa chớm đón ban mai';
+          advice = "Chỉ một chút xíu nỗ lực nữa thôi là hoa khai lộng lẫy tinh khiết. Cố thử lại một ván tiếp nha.";
+          emoji = '🌷';
+        }
+
+        document.getElementById('summary-emoji').innerText = emoji;
+        document.getElementById('summary-headline').innerText = title;
+        document.getElementById('summary-quiz-score').innerText = score;
+        document.getElementById('summary-quiz-streak').innerText = `${quizEngine.maxStreak} ván`;
+        document.getElementById('summary-quiz-advice').innerHTML = `💡 <strong>Lời nhận xét ngọt ngào:</strong> ${advice}`;
+
+        // Save
+        const correctCount = quizEngine.questions.filter((q, idx) => {
+          // Checks answer sheets
+          return q.answer === q.options.find(opt => opt === q.answer); // approximation
+        }).length; // rough correct count
+        const acc = Math.round((quizEngine.score / 100) * 100) || 50;
+        saveScore('quiz', score, Math.min(100, acc));
+      }
+
+      // 7. CARD MATCH GAME ENGINE
+      let matchEngine = {
+        cards: [],
+        selected: [],
+        moves: 0,
+        matches: 0,
+        timer: null,
+        seconds: 0
+      };
+
+      function startMatch() {
+        document.getElementById('match-intro').classList.add('hidden');
+        document.getElementById('match-summary').classList.add('hidden');
+        document.getElementById('match-arena').classList.remove('hidden');
+
+        matchEngine.moves = 0;
+        matchEngine.matches = 0;
+        matchEngine.seconds = 0;
+        matchEngine.selected = [];
+
+        document.getElementById('match-moves').innerText = "0 lượt";
+        document.getElementById('match-progress').innerText = "0 / 6 cặp";
+        document.getElementById('match-timer').innerText = "0:00";
+
+        // Shuffle 6 items
+        const pool = [...ALL_CHEMICALS_DATA].sort(() => 0.5 - Math.random());
+        const selected = pool.slice(0, 6);
+
+        const cardTemplates = [];
+        const colors = [
+          'bg-gradient-to-br from-pink-50 to-pink-100 border-pink-200 text-pink-900',
+          'bg-gradient-to-br from-teal-50 to-teal-100 border-teal-200 text-teal-900',
+          'bg-gradient-to-br from-rose-50 to-rose-100 border-rose-200 text-rose-900',
+          'bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200 text-purple-900',
+          'bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200 text-indigo-900',
+          'bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200 text-amber-900'
+        ];
+
+        selected.forEach((item, index) => {
+          const col = colors[index % colors.length];
+          cardTemplates.push({
+            id: `name-${item.id}`,
+            content: `${item.symbol}<span class="text-[9px] block text-stone-500/80 uppercase font-black tracking-tight mt-1 truncate">${item.name}</span>`,
+            type: 'name',
+            itemId: item.id,
+            isMatched: false,
+            color: col
+          });
+          cardTemplates.push({
+            id: `val-${item.id}`,
+            content: `<span class="text-xs font-black block tracking-tight font-display text-orange-950 uppercase">Hóa Trị</span><span class="text-xl font-bold font-display leading-none mt-1 mt-0.5">${item.valenceText}</span>`,
+            type: 'valence',
+            itemId: item.id,
+            isMatched: false,
+            color: 'bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200 text-orange-950'
+          });
+        });
+
+        matchEngine.cards = cardTemplates.sort(() => 0.5 - Math.random());
+        renderMatchCards();
+
+        matchEngine.timer = setInterval(() => {
+          matchEngine.seconds++;
+          const mins = Math.floor(matchEngine.seconds / 60);
+          const secs = matchEngine.seconds % 60;
+          document.getElementById('match-timer').innerText = `${mins}:${secs<10?'0':''}${secs}`;
+        }, 1000);
+      }
+
+      function renderMatchCards() {
+        const board = document.getElementById('match-board');
+        let html = '';
+        matchEngine.cards.forEach((card, idx) => {
+          if (card.isMatched) {
+            html += `
+              <div class="h-20 aspect-[4/3] rounded-2xl border border-dashed border-emerald-300 bg-emerald-50/20 text-emerald-700 flex flex-col items-center justify-center opacity-30 select-none">
+                <span class="text-[10px] font-black uppercase tracking-widest leading-none">✿ Khớp</span>
+              </div>
+            `;
+          } else {
+            const isFlipped = matchEngine.selected.includes(idx);
+            html += `
+              <div onclick="clickMatchCard(${idx})" class="h-20 aspect-[4/3] card-perspective cursor-pointer relative">
+                <div class="card-inner w-full h-full duration-300 relative ${isFlipped?'card-flipped':''}">
+                  <!-- BACK FACE (CLOSED) -->
+                  <div class="absolute inset-0 bg-gradient-to-tr from-pink-50 to-amber-50 border-2 border-dashed border-rose-300/60 p-2 rounded-2xl flex flex-col items-center justify-center text-center backface-hidden shadow-xs hover:border-pink-500 hover:scale-102">
+                    <span class="text-lg text-rose-400 select-none animate-pulse leading-none">✿</span>
+                    <span class="text-[8px] uppercase tracking-widest font-black font-display text-rose-500/70 block mt-1 leading-none">HỎA TRỊ</span>
+                  </div>
+                  <!-- FRONT FACE (REVEAL) -->
+                  <div class="absolute inset-0 border-2 p-3.5 rounded-2xl flex flex-col items-center justify-center text-center backface-hidden shadow-xs font-semibold ${card.color} card-flipped" style="transform: rotateY(180deg);">
+                    <div class="leading-none flex flex-col items-center justify-center text-xs select-none">${card.content}</div>
+                  </div>
+                </div>
+              </div>
+            `;
+          }
+        });
+        board.innerHTML = html;
+      }
+
+      function clickMatchCard(idx) {
+        if (matchEngine.selected.length >= 2) return;
+        if (matchEngine.selected.includes(idx)) return;
+
+        matchEngine.selected.push(idx);
+        renderMatchCards();
+
+        if (matchEngine.selected.length === 2) {
+          matchEngine.moves++;
+          document.getElementById('match-moves').innerText = `${matchEngine.moves} lượt`;
+
+          const [f, s] = matchEngine.selected;
+          const first = matchEngine.cards[f];
+          const second = matchEngine.cards[s];
+
+          if (first.itemId === second.itemId && first.type !== second.type) {
+            // MATCHED
+            setTimeout(() => {
+              first.isMatched = true;
+              second.isMatched = true;
+              matchEngine.matches++;
+              document.getElementById('match-progress').innerText = `${matchEngine.matches} / 6 cặp`;
+              matchEngine.selected = [];
+              renderMatchCards();
+
+              if (matchEngine.matches === 6) {
+                endMatchGame(true);
+              }
+            }, 600);
+          } else {
+            // MISMATCH - Flip back
+            setTimeout(() => {
+              matchEngine.selected = [];
+              renderMatchCards();
+            }, 1100);
+          }
+        }
+      }
+
+      function endMatchGame(isFinished) {
+        if (matchEngine.timer) clearInterval(matchEngine.timer);
+        document.getElementById('match-arena').classList.add('hidden');
+        document.getElementById('match-summary').classList.remove('hidden');
+
+        const moves = matchEngine.moves;
+        const speedFactor = Math.max(0, 60 - matchEngine.seconds) * 2.5;
+        const baseFactor = Math.max(0, 20 - (moves - 6)) * 4;
+        const score = Math.round(50 + speedFactor + baseFactor);
+        const accuracy = Math.round((6 / moves) * 100) || 50;
+
+        document.getElementById('match-summary-time').innerText = document.getElementById('match-timer').innerText;
+        document.getElementById('match-summary-moves').innerText = `${moves} lượt`;
+        document.getElementById('match-summary-accuracy').innerText = `${accuracy}%`;
+
+        if (matchEngine.seconds <= 45) {
+          unlockAchievement('fast_matcher');
+        }
+
+        saveScore('match', score, accuracy);
+      }
+
+      // 8. SORT GAME ENGINE
+      let sortEngine = {
+        currentIdx: 0,
+        score: 0,
+        streak: 0,
+        maxStreak: 0,
+        timeLeft: 45,
+        timer: null,
+        itemsToPlay: []
+      };
+
+      function startSort() {
+        document.getElementById('sort-intro').classList.add('hidden');
+        document.getElementById('sort-summary').classList.add('hidden');
+        document.getElementById('sort-arena').classList.remove('hidden');
+
+        sortEngine.score = 0;
+        sortEngine.streak = 0;
+        sortEngine.maxStreak = 0;
+        sortEngine.timeLeft = 45;
+        sortEngine.currentIdx = 0;
+
+        document.getElementById('sort-streak').innerText = "0 ván";
+        document.getElementById('sort-timer').innerText = "45";
+        document.getElementById('sort-active-score').innerText = "0";
+        document.getElementById('sort-feedback-text').classList.add('hidden');
+
+        // Infinite pool shuffler
+        sortEngine.itemsToPlay = [...ALL_CHEMICALS_DATA].sort(() => 0.5 - Math.random());
+        showSortItem();
+
+        sortEngine.timer = setInterval(() => {
+          sortEngine.timeLeft--;
+          document.getElementById('sort-timer').innerText = sortEngine.timeLeft;
+          
+          if (sortEngine.timeLeft <= 10) {
+            document.getElementById('sort-timer-box').className = "flex items-center space-x-1 bg-rose-100 text-rose-750 px-3 py-1 rounded-full border border-rose-300 animate-pulse font-mono";
+          } else {
+            document.getElementById('sort-timer-box').className = "flex items-center space-x-1 bg-rose-50 text-rose-700 px-3 py-1 rounded-full border border-rose-100 font-mono";
+          }
+
+          if (sortEngine.timeLeft <= 0) {
+            clearInterval(sortEngine.timer);
+            endSortGame();
+          }
+        }, 1000);
+      }
+
+      function showSortItem() {
+        const item = sortEngine.itemsToPlay[sortEngine.currentIdx];
+        
+        document.getElementById('sort-cat-badge').innerText = item.type === 'element' ? 'Nguyên Tố Hộp' : 'Gốc Axit Cầm';
+        document.getElementById('sort-cat-badge').className = `text-[9px] font-bold px-2.5 py-0.5 rounded-full ${item.type === 'element'?'bg-teal-100 text-teal-800':'bg-indigo-100 text-indigo-800'}`;
+        document.getElementById('sort-big-symbol').innerText = item.symbol;
+        document.getElementById('sort-item-name').innerText = item.name;
+      }
+
+      const JAR_MAPS = {
+        'I': [1],
+        'II': [2],
+        'III_other': [3, 4, 5, 6]
+      };
+
+      function submitSort(jarScope) {
+        if (sortEngine.timeLeft <= 0) return;
+
+        const currentItem = sortEngine.itemsToPlay[sortEngine.currentIdx];
+        const primaryValences = currentItem.valences; // array e.g. [1] or [2, 3]
+        const allowedTargets = JAR_MAPS[jarScope];
+
+        const isCorrect = primaryValences.some(v => allowedTargets.includes(v));
+
+        // Floating popup animation trigger
+        const floatIndicator = document.getElementById('sort-float-val');
+        if (isCorrect) {
+          sortEngine.score += 15;
+          sortEngine.streak++;
+          if (sortEngine.streak > sortEngine.maxStreak) sortEngine.maxStreak = sortEngine.streak;
+
+          document.getElementById('sort-active-score').innerText = sortEngine.score;
+          document.getElementById('sort-streak').innerText = `${sortEngine.streak} ván`;
+
+          floatIndicator.innerText = "+15 pt";
+          floatIndicator.className = "absolute font-black text-xs px-3 py-1 rounded-full shadow-md z-20 pointer-events-none bg-emerald-100 text-emerald-800 border border-emerald-300 animate-point";
+
+          const fb = document.getElementById('sort-feedback-text');
+          fb.classList.remove('hidden');
+          fb.innerText = `Chính xác! ${currentItem.symbol} hóa trị ${currentItem.valenceText}`;
+          fb.className = "text-[11px] font-bold leading-none py-1.5 px-3 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-150 inline-block";
+
+          if (sortEngine.streak >= 10) {
+            unlockAchievement('sorter_champion');
+          }
+        } else {
+          // False click
+          sortEngine.streak = 0;
+          document.getElementById('sort-streak').innerText = "0 ván";
+          sortEngine.score = Math.max(0, sortEngine.score - 5);
+          sortEngine.timeLeft = Math.max(0, sortEngine.timeLeft - 3);
+
+          document.getElementById('sort-active-score').innerText = sortEngine.score;
+          document.getElementById('sort-timer').innerText = sortEngine.timeLeft;
+
+          floatIndicator.innerText = "-5 pt & -3s";
+          floatIndicator.className = "absolute font-black text-xs px-3 py-1 rounded-full shadow-md z-20 pointer-events-none bg-rose-100 text-rose-800 border border-rose-300 animate-point";
+
+          const fb = document.getElementById('sort-feedback-text');
+          fb.classList.remove('hidden');
+          fb.innerText = `Chưa đúng! ${currentItem.name} (${currentItem.symbol}) có hóa trị ${currentItem.valenceText}`;
+          fb.className = "text-[11px] font-bold leading-none py-1.5 px-3 rounded-full bg-amber-50 text-amber-700 border border-amber-150 inline-block";
+
+          // Shake target jar
+          const jarNode = document.getElementById(jarScope==='I'?'jar-i':jarScope==='II'?'jar-ii':'jar-other');
+          if (jarNode) {
+            jarNode.classList.add('animate-bounce', 'border-rose-450');
+            setTimeout(() => {
+              jarNode.classList.remove('animate-bounce', 'border-rose-450');
+            }, 600);
+          }
+        }
+
+        // Clean popup floats after 1s
+        setTimeout(() => {
+          floatIndicator.className = "absolute font-black text-xs px-3 py-1 rounded-full shadow-md z-20 pointer-events-none opacity-0";
+        }, 1000);
+
+        // Advance
+        sortEngine.currentIdx++;
+        if (sortEngine.currentIdx >= sortEngine.itemsToPlay.length) {
+          // append new lists
+          const more = [...ALL_CHEMICALS_DATA].sort(() => 0.5 - Math.random());
+          sortEngine.itemsToPlay.push(...more);
+        }
+        showSortItem();
+        lucide.createIcons();
+      }
+
+      function endSortGame() {
+        if (sortEngine.timer) clearInterval(sortEngine.timer);
+        document.getElementById('sort-arena').classList.add('hidden');
+        document.getElementById('sort-summary').classList.remove('hidden');
+
+        document.getElementById('sort-summary-score').innerText = sortEngine.score;
+        document.getElementById('sort-summary-streak').innerText = `${sortEngine.maxStreak} ván`;
+
+        const accuracy = Math.round((sortEngine.score / 15) / (sortEngine.currentIdx || 1) * 100) || 50;
+        saveScore('sort', sortEngine.score, Math.min(100, accuracy));
+      }
+    </script>
+  </body>
+</html>
+

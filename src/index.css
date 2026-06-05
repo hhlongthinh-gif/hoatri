@@ -1,0 +1,53 @@
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Quicksand", "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Quicksand", sans-serif;
+  
+  /* Soft flower garden colors */
+  --color-garden-pink-light: #FFF0F5; /* LavenderBlush */
+  --color-garden-pink: #FFD1DC; /* Soft pink */
+  --color-garden-rose: #FFB7C5; /* Cherry blossom pink */
+  --color-garden-lavender: #E6E6FA; /* Lavender */
+  --color-garden-purple: #BDB5E2; /* Soft purple */
+  --color-garden-mint: #E8F5E9; /* Pastel mint */
+  --color-garden-leafen: #A5D6A7; /* Leaf green */
+  --color-garden-peach: #FFECDB; /* Soft peach */
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #FAF6F0; /* Soft warm ivory background */
+  color: #3E2723; /* Warm deep brown/charcoal instead of stark black */
+}
+
+/* Custom soft shadows */
+.soft-card-shadow {
+  box-shadow: 0 10px 30px -10px rgba(255, 183, 197, 0.35);
+}
+
+.soft-glow-pink {
+  box-shadow: 0 0 15px rgba(255, 183, 197, 0.5);
+}
+
+.soft-glow-mint {
+  box-shadow: 0 0 15px rgba(165, 214, 167, 0.5);
+}
+
+/* Scrollbar customization */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-garden-rose);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-garden-purple);
+}
+

@@ -1,0 +1,6 @@
+{
+  "name": "Vườn Hoa Hóa Trị",
+  "description": "Ứng dụng học tập và thực hành hóa trị nguyên tố và gốc muối theo phong cách hoa cỏ dễ thương dành cho học sinh trung học phổ thông.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
